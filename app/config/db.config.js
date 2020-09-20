@@ -3,5 +3,11 @@ module.exports = {
   USER: process.env.TRACKERDB_USERNAME,
   PASSWORD: process.env.TRACKERDB_PASSWORD,
   DB: process.env.TRACKERDB_SCHEMA,
-  DB_URL: process.env.CLEARDB_DATABASE_URL
+  dialect: "mysql",
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000
+  }
 };

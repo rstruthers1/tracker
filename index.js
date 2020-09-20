@@ -2,8 +2,39 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const path = require('path');
 require('dotenv').config();
+const cors = require("cors");
+
+const db = require("./app/models");
+// const Role = db.role;
+
+db.sequelize.sync().then(() => {
+  console.log('Sync Db');
+  // initial();
+});
+
+// function initial() {
+//   Role.create({
+//     id: 1,
+//     name: "user"
+//   });
+//
+//   Role.create({
+//     id: 2,
+//     name: "moderator"
+//   });
+//
+//   Role.create({
+//     id: 3,
+//     name: "admin"
+//   });
+// }
 
 const app = express();
+var corsOptions = {
+  origin: "http://localhost:8081"
+};
+
+app.use(cors(corsOptions));
 
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
@@ -11,20 +42,16 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 app.use(bodyParser.json());
 // parse requests of content-type: application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
+// routes
+require('./app/routes/auth.routes')(app);
+require('./app/routes/user.routes')(app);
 
-// An api endpoint that returns a short list of items
-app.get('/api/getList', (req,res) => {
-  var list = ["item1", "item2", "item3"];
-  res.json(list);
-  console.log('Sent list of items');
-});
 
 // simple route
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to bezkoder application." });
 });
 
-require("./app/routes/customer.routes")(app);
 
 // Handles any requests that don't match the ones above
 app.get('*', (req,res) =>{
