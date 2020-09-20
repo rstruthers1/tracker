@@ -9,15 +9,15 @@ const dbConfig = require("../config/db.config.js");
 //   database: dbConfig.DB
 // });
 
-const connection = mysql.createConnection(dbConfig.DB_URL)
+const connection = mysql.createPool(dbConfig.DB_URL)
 
 // open the MySQL connection
-connection.connect(error => {
-  if (error) {
-    console.log(error);
-  } else {
-    console.log("Successfully connected to the database.");
-  }
-});
+// connection.connect(error => {
+//   if (error) {
+//     console.log(error);
+//   } else {
+//     console.log("Successfully connected to the database.");
+//   }
+// });
 
 module.exports = connection;
