@@ -30,6 +30,13 @@ https://rms-tracker.herokuapp.com/
 
 ### Others
 * https://flaviocopes.com/express-send-response/
+* https://github.com/validatorjs/validator.js
+* https://react-select.com/home
+
+### Maybe look at?
+* https://medium.com/frontend-digest/the-best-react-form-library-to-use-in-2020-11e93c267e4
+* https://formik.org/docs/overview
+* https://react-hook-form.com/get-started
 
 
 
