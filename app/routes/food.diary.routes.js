@@ -10,12 +10,16 @@ module.exports = function(app) {
     next();
   });
 
-
-
   app.get(
     "/api/food/diary",
     [authJwt.verifyToken],
     controller.foodDiary
+  );
+
+  app.post(
+    "/api/food",
+    [authJwt.verifyToken],
+    controller.foodSubmitted
   );
 
 };
