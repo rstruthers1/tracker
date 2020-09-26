@@ -37,7 +37,10 @@ https://rms-tracker.herokuapp.com/
 * https://medium.com/frontend-digest/the-best-react-form-library-to-use-in-2020-11e93c267e4
 * https://formik.org/docs/overview
 * https://react-hook-form.com/get-started
-https://www.carlrippon.com/getting-started-with-react-hook-form-with-typeScript/
+* https://www.carlrippon.com/getting-started-with-react-hook-form-with-typeScript/
+* https://getbootstrap.com/docs/4.0/components/forms/
+* https://material-ui.com/components/tables/
+* https://github.com/jcmcneal/react-step-wizard
 
 
 

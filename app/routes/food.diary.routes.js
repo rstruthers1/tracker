@@ -22,4 +22,24 @@ module.exports = function(app) {
     controller.foodSubmitted
   );
 
+
+
+  app.get("/api/food",
+    [authJwt.verifyToken],
+    controller.getAllFoods
+  )
+
+  app.post(
+    "/api/food/diary",
+    [authJwt.verifyToken],
+    controller.addFoodsToDiary
+  );
+
+  app.delete(
+    "/api/food/diary",
+    [authJwt.verifyToken],
+    controller.deleteFoodDiaryItem
+  );
+
+
 };

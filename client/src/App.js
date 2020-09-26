@@ -11,6 +11,7 @@ import Home from "./components/Home";
 import Profile from "./components/Profile";
 import FoodDiary from "./components/FoodDiary";
 import AddNewFood from "./components/AddNewFood";
+import AddFoodToDiary from "./components/AddFoodToDiary"
 
 
 const App = () => {
@@ -99,6 +100,7 @@ const App = () => {
       </nav>
 
       <div className="container mt-3">
+
         <Switch>
           <Route exact path={["/", "/home"]} component={Home} />
           <Route exact path="/login" component={Login} />
@@ -107,6 +109,7 @@ const App = () => {
           <Route path="/food" component={FoodDiary} />
           <Route path="/addNewFood" component={AddNewFood} />
 
+          <Route path="/addFoodToDiary" component={AddFoodToDiary}/>
         </Switch>
       </div>
     </div>
