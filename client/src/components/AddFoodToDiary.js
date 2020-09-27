@@ -1,69 +1,253 @@
 import React, { useState, useEffect } from "react";
-import { useForm} from "react-hook-form";
-import { withStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
+import clsx from 'clsx';
+import {createMuiTheme, lighten, makeStyles} from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
-
+import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
+import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-import queryString from "query-string";
-import FoodService from "../services/food.service";
+import Checkbox from '@material-ui/core/Checkbox';
+import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
+import DeleteIcon from '@material-ui/icons/Delete';
+import FilterListIcon from '@material-ui/icons/FilterList';
+import { ThemeProvider } from '@material-ui/styles';
+
 import { useHistory } from 'react-router-dom';
 
+import queryString from "query-string";
 
-const StyledTableCell = withStyles((theme) => ({
-  head: {
-    backgroundColor: '#00548F',
-    color: theme.palette.common.white,
-  },
-  body: {
-    fontSize: 14,
-  },
-}))(TableCell);
+import FoodService from "../services/food.service";
+import {dateOptions, addFoodDiary} from "../utils/tracker.constants";
 
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#00548F',
+    },
+    secondary: {
+      main: '#00548F',
+    },
+  },
+});
+
+
+function descendingComparator(a, b, orderBy) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
+  }
+  if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
+}
+
+function getComparator(order, orderBy) {
+  return order === 'desc'
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
+}
+
+function stableSort(array, comparator) {
+  const stabilizedThis = array.map((el, index) => [el, index]);
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0]);
+    if (order !== 0) return order;
+    return a[1] - b[1];
+  });
+  return stabilizedThis.map((el) => el[0]);
+}
+
+const headCells = [
+  { id: 'description', numeric: false, disablePadding: true, label: 'Description' },
+  { id: 'calories', numeric: true, disablePadding: false, label: 'Calories' },
+
+];
+
+function EnhancedTableHead(props) {
+  const { classes, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
+  const createSortHandler = (property) => (event) => {
+    onRequestSort(event, property);
+  };
+
+  return (
+    <TableHead>
+      <TableRow>
+        <TableCell padding="checkbox">
+          <Checkbox
+            indeterminate={numSelected > 0 && numSelected < rowCount}
+            checked={rowCount > 0 && numSelected === rowCount}
+            onChange={onSelectAllClick}
+            inputProps={{ 'aria-label': 'select all foods' }}
+          />
+        </TableCell>
+        {headCells.map((headCell) => (
+          <TableCell
+            key={headCell.id}
+            align={headCell.numeric ? 'right' : 'left'}
+            padding={headCell.disablePadding ? 'none' : 'default'}
+            sortDirection={orderBy === headCell.id ? order : false}
+          >
+            <TableSortLabel
+              active={orderBy === headCell.id}
+              direction={orderBy === headCell.id ? order : 'asc'}
+              onClick={createSortHandler(headCell.id)}
+            >
+              {headCell.label}
+              {orderBy === headCell.id ? (
+                <span className={classes.visuallyHidden}>
+                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                </span>
+              ) : null}
+            </TableSortLabel>
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+  );
+}
+
+EnhancedTableHead.propTypes = {
+  classes: PropTypes.object.isRequired,
+  numSelected: PropTypes.number.isRequired,
+  onRequestSort: PropTypes.func.isRequired,
+  onSelectAllClick: PropTypes.func.isRequired,
+  order: PropTypes.oneOf(['asc', 'desc']).isRequired,
+  orderBy: PropTypes.string.isRequired,
+  rowCount: PropTypes.number.isRequired,
+};
+
+const useToolbarStyles = makeStyles((theme) => ({
+  root: {
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(1),
+  },
+  highlight:
+    theme.palette.type === 'light'
+      ? {
+        color: theme.palette.primary.main,
+        backgroundColor: lighten(theme.palette.primary.light, 0.85),
+      }
+      : {
+        color: theme.palette.text.primary,
+        backgroundColor: theme.palette.primary.dark,
+      },
+  title: {
+    flex: '1 1 100%',
+  },
+}));
+
+const EnhancedTableToolbar = (props) => {
+  const classes = useToolbarStyles();
+  const { numSelected } = props;
+
+  return (
+    <Toolbar
+      className={clsx(classes.root, {
+        [classes.highlight]: numSelected > 0,
+      })}
+    >
+      {numSelected > 0 ? (
+        <Typography className={classes.title} color="inherit" variant="subtitle1" component="div">
+          {numSelected} selected
+        </Typography>
+      ) : (
+        <Typography component="div">
+          Search: <input
+          type="text"
+          value={props.filterStr}
+          onChange={props.handleFilterChange}
+                />
+        </Typography>
+      )}
+    </Toolbar>
+  );
+};
+
+EnhancedTableToolbar.propTypes = {
+  numSelected: PropTypes.number.isRequired,
+};
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+
+  },
+  paper: {
+    width: '600px',
+    marginBottom: theme.spacing(2),
+  },
+  table: {
+
+  },
+  visuallyHidden: {
+    border: 0,
+    clip: 'rect(0 0 0 0)',
+    height: 1,
+    margin: -1,
+    overflow: 'hidden',
+    padding: 0,
+    position: 'absolute',
+    top: 20,
+    width: 1,
+  },
+}));
 
 const AddFoodToDiary = (props) => {
-  const history = useHistory();
-  const { register, handleSubmit} = useForm();
-  console.log(JSON.stringify(props));
-  console.log(props.history.location.search);
-  const parsed = queryString.parse(props.history.location.search);
-  console.log(parsed);
-  let date = new Date(parsed.date);
-  console.log("date: " + date);
 
-  const [foods, setFoods] = useState("");
-  let loadError = null;
+  const [order, setOrder] = React.useState('asc');
+  const [orderBy, setOrderBy] = React.useState('description');
+  const [selected, setSelected] = React.useState([]);
+  const [page, setPage] = React.useState(0);
+  const [dense, setDense] = React.useState(false);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [data, setData] = useState({foods: [], isFetching: false, error: ''});
+  const [filterStr, setFilterStr] = React.useState('');
+  const [filtered, setFiltered] = React.useState([]);
+
+  const parsed = queryString.parse(props.history.location.search);
+
+  let date = new Date(parsed.date);
+  let meal = parsed.meal;
+
+  const classes = useStyles();
+  const history = useHistory();
 
   useEffect(() => {
+    setData({foods: data.foods, isFetching: true, error: ''});
+    setFiltered(getFoodsMatchingDescription(data.foods, filterStr));
     FoodService.getAllFoods().then(
       (response) => {
         console.log(JSON.stringify(response.data));
-        setFoods(response.data);
-
+        setData({foods: response.data, isFetching: false, error: ''});
+        setFiltered(getFoodsMatchingDescription(response.data, filterStr));
       },
       (error) => {
-
-        alert(error.toString())
+        setData({foods: data.foods, isFetching: false, error: error.toString()});
+        setFiltered(getFoodsMatchingDescription(data.foods, filterStr));
       }
     );
   }, []);
 
-  const onSubmit = data => {
-    console.log(JSON.stringify(data));
-    console.log(Object.keys(data));
-    let foodsToAdd = [];
-    Object.keys(data).forEach(key => {
-      console.log("key: " + key);
-      console.log("value: " + data[key]);
-      if (data[key]) {
-        foodsToAdd.push(parseInt(key))
-      }
-    });
-
-    if (foodsToAdd.length > 0) {
+  const onSubmit = event => {
+    console.log(JSON.stringify(selected));
+    if (selected.length > addFoodDiary.MAX_ITEMS_SUBMIT_AT_ONE_TIME) {
+      alert(`Please select ${addFoodDiary.MAX_ITEMS_SUBMIT_AT_ONE_TIME} or fewer items to add.`);
+      return;
+    }
+    if (selected.length > 0) {
+      const foodsToAdd = [];
+      selected.forEach(i => {
+        foodsToAdd.push(i);
+      });
       const foodDiaryData = {
         foodIds: foodsToAdd,
         meal: parsed.meal,
@@ -75,55 +259,180 @@ const AddFoodToDiary = (props) => {
           history.push(`/food`)
         },
         (error) => {
-          console.log(JSON.stringify(error));
-          loadError = JSON.stringify(error);
+          alert(JSON.stringify(error));
         }
       )
     }
   };
 
- return (
-   <div className="container">
-     <h1>Add Food To Diary: {parsed.meal}</h1>
-     <div>Date: {date.toLocaleDateString('en-us')}</div>
-     <form onSubmit={handleSubmit(onSubmit)}>
-     <Table component={Paper} style={{width: "600px"}}>
-       <TableHead>
-         <TableRow>
-           <TableCell style={{fontSize: "8"}}>
-             <div className="form-group">
-               <div className="col-sm-6">
-               <button type="submit"  className="btn btn-primary btn-block">Add Checked</button>
-               </div>
-             </div>
-           </TableCell>
+  const handleRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
 
-           <StyledTableCell align="right">Calories</StyledTableCell>
+  const handleSelectAllClick = (event) => {
+    if (event.target.checked) {
+      const newSelecteds = data.foods.map((n) => n.id);
+      setSelected(newSelecteds);
+      return;
+    }
+    setSelected([]);
+  };
 
-         </TableRow>
-       </TableHead>
-       <TableBody>
-       {foods ? (
+  const handleClick = (event, name) => {
+    const selectedIndex = selected.indexOf(name);
+    console.log("selectedIndex: " + selectedIndex);
+    let newSelected = [];
 
-         foods.map((row) =>
-           <TableRow key={row.id}>
-             <TableCell>
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, name);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1),
+      );
+    }
 
-               <input name={row.id} type="checkbox" autoComplete="off" ref={register}/>
-               <span style={{paddingLeft: "10px"}}>{row.description}</span>
+    setSelected(newSelected);
+  };
 
-             </TableCell>
-             <TableCell align="right">{row.calories}</TableCell>
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
-           </TableRow>
-         )): (loadError? <TableRow><TableCell>{loadError}</TableCell></TableRow> :
-         <TableRow><TableCell>Loading...</TableCell></TableRow>)}
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
-       </TableBody>
-     </Table>
-     </form>
-   </div>
- )
+  const handleChangeDense = (event) => {
+    setDense(event.target.checked);
+  };
+
+  const isSelected = (name) => selected.indexOf(name) !== -1;
+
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, filtered.length - page * rowsPerPage);
+
+  const getFoodsMatchingDescription = (items, partialDescription) => {
+    let matchingItems = [];
+    console.log("getMatchingItems from: " + JSON.stringify(items));
+    if (!items) {
+      return matchingItems;
+    }
+    items.forEach(food => {
+      if (food.description.toLowerCase().includes(partialDescription.toLowerCase())) {
+        matchingItems.push(food);
+      }
+    });
+    return matchingItems;
+  };
+
+  const handleFilterChange = e => {
+    console.log(e.target.value);
+    setFilterStr(e.target.value);
+    let viewableFoods = getFoodsMatchingDescription (data.foods, e.target.value);
+    setFiltered(viewableFoods);
+    console.log("filtered: " + JSON.stringify(filtered));
+  };
+
+
+  return(
+    <div className="container">
+      <div style={{paddingBottom: "10px"}}>
+      <div style={{paddingBottom: "10px", fontWeight: "bold"}}>Add Food to {meal}: {date.toLocaleDateString('en-us', dateOptions)}</div>
+      <div>
+        {data.isFetching && <div>Loading...</div>}
+        {data.error && <div>{data.error}</div>}
+      </div>
+        <div className={classes.root}>
+          <ThemeProvider theme={theme}>
+          <Paper className={classes.paper}>
+            <EnhancedTableToolbar numSelected={selected.length}
+                                  filterStr={filterStr}
+                                  handleFilterChange={handleFilterChange}/>
+            <TableContainer>
+              <Table
+                className={classes.table}
+                aria-labelledby="tableTitle"
+                size={dense ? 'small' : 'medium'}
+                aria-label="enhanced table"
+              >
+                <EnhancedTableHead
+                  classes={classes}
+                  numSelected={selected.length}
+                  order={order}
+                  orderBy={orderBy}
+                  onSelectAllClick={handleSelectAllClick}
+                  onRequestSort={handleRequestSort}
+                  rowCount={filtered.length}
+                />
+                <TableBody>
+                  {stableSort(filtered, getComparator(order, orderBy))
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row, index) => {
+                      const isItemSelected = isSelected(row.id);
+                      const labelId = `enhanced-table-checkbox-${index}`;
+
+                      return (
+                        <TableRow
+                          hover
+                          onClick={(event) => handleClick(event, row.id)}
+                          role="checkbox"
+                          aria-checked={isItemSelected}
+                          tabIndex={-1}
+                          key={row.id}
+                          selected={isItemSelected}
+                        >
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              checked={isItemSelected}
+                              inputProps={{ 'aria-labelledby': labelId }}
+                            />
+                          </TableCell>
+                          <TableCell component="th" id={labelId} scope="row" padding="none">
+                            {row.description}
+                          </TableCell>
+                          <TableCell align="right">{row.calories}</TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  {emptyRows > 0 && (
+                    <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
+                      <TableCell colSpan={6} />
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={filtered.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onChangePage={handleChangePage}
+              onChangeRowsPerPage={handleChangeRowsPerPage}
+            />
+          </Paper>
+          </ThemeProvider>
+          <FormControlLabel
+            control={<Switch checked={dense} onChange={handleChangeDense} />}
+            label="Dense padding"
+          />
+        </div>
+      </div>
+      <div className="form-group">
+        <div className="col-sm-4">
+          <button type="submit"  className="btn btn-primary btn-block" onClick={event => onSubmit(event)}>Add Checked</button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default AddFoodToDiary;

@@ -14,6 +14,7 @@ import FoodDiaryUtils from '../utils/food.diary.utils';
 import Styles from './Styles';
 import {cellWidths} from "../utils/tracker.constants";
 
+
 const DiaryMeal = (props) => {
   const classes = Styles.useStyles();
   let foodItems = props.foodItems;

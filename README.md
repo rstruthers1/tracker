@@ -42,6 +42,9 @@ https://rms-tracker.herokuapp.com/
 * https://material-ui.com/components/tables/
 * https://github.com/jcmcneal/react-step-wizard
 * https://medium.com/javascript-in-plain-english/state-management-with-react-hooks-no-redux-or-context-api-8b3035ceecf8
+* https://adazzle.github.io/react-data-grid/
+* https://blog.logrocket.com/patterns-for-data-fetching-in-react-981ced7e5c56/
+* https://stackoverflow.com/questions/35582978/best-way-to-filter-table-in-react
 
 
 

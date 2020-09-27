@@ -11,7 +11,7 @@ import DiaryMeal from './DiaryMeal';
 import FoodDiaryUtils from '../utils/food.diary.utils'
 import Styles from './Styles';
 import FoodHeaderTableCell from "./FoodHeaderTableCell";
-import {mealTypes, cellWidths} from "../utils/tracker.constants";
+import {mealTypes, cellWidths, dateOptions} from "../utils/tracker.constants";
 import FoodDiaryDivider from "./FoodDiaryDivider";
 import ArrowLeftIcon from '@material-ui/icons/ArrowLeft';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
@@ -70,8 +70,6 @@ const FoodDiary = (props) => {
       }
     );
   };
-
-  const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
   console.log("globalState.foodDiaryDate: " + globalState.foodDiaryDate);
   return (
