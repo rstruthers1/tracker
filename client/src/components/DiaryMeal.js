@@ -18,7 +18,7 @@ const DiaryMeal = (props) => {
   const classes = Styles.useStyles();
   let foodItems = props.foodItems;
   let meal = props.meal;
-  let dateString = props.dateString;
+  let date = props.date;
   let deleteFoodItemAction = props.deleteFoodItemAction;
 
   return (
@@ -52,7 +52,7 @@ const DiaryMeal = (props) => {
           <TableRow>
             <TableCell align="left" className={classes.tableCell}>
               <Link style={{fontWeight: 'bold'}}
-                    to={`/addFoodToDiary?date=${dateString}&meal=${meal}`}>
+                    to={`/addFoodToDiary?date=${FoodDiaryUtils.dateToQueryParamValue(date)}&meal=${meal}`}>
                 Add Food
               </Link>
             </TableCell>

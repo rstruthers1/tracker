@@ -22,7 +22,15 @@ const getMealItems = (items, meal) => {
   return mealItems;
 };
 
+const dateToQueryParamValue = date => {
+  if (!date) {
+    return "";
+  }
+  return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+};
+
 export default {
   sumCalories,
-  getMealItems
+  getMealItems,
+  dateToQueryParamValue
 }

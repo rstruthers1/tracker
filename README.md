@@ -41,6 +41,7 @@ https://rms-tracker.herokuapp.com/
 * https://getbootstrap.com/docs/4.0/components/forms/
 * https://material-ui.com/components/tables/
 * https://github.com/jcmcneal/react-step-wizard
+* https://medium.com/javascript-in-plain-english/state-management-with-react-hooks-no-redux-or-context-api-8b3035ceecf8
 
 
 

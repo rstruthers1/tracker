@@ -16,24 +16,24 @@ import FoodDiaryDivider from "./FoodDiaryDivider";
 import ArrowLeftIcon from '@material-ui/icons/ArrowLeft';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import IconButton from "@material-ui/core/IconButton";
-
-let date = new Date();
+import useGlobal from "../store";
 
 const FoodDiary = (props) => {
 
+  const [globalState, globalActions] = useGlobal();
   const [breakfastItems, setBreakfastItems] = useState("");
   const [lunchItems, setLunchItems] = useState("");
   const [dinnerItems, setDinnerItems] = useState("");
   const [snackItems, setSnackItems] = useState("");
 
   const classes = Styles.useStyles();
-  let dateString = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
 
   useEffect(() => {
-    fetchFoodDiaryItems(dateString);
-  }, [dateString]);
+    fetchFoodDiaryItems(globalState.foodDiaryDate);
+  }, []);
 
-  const fetchFoodDiaryItems = theDateString => {
+  const fetchFoodDiaryItems = date => {
+    let theDateString = FoodDiaryUtils.dateToQueryParamValue(date);
     FoodService.getFoodDiary(theDateString).then(
       (response) => {
         console.log(JSON.stringify(response.data));
@@ -46,14 +46,24 @@ const FoodDiary = (props) => {
         alert(error.toString());
       }
     );
-  ;}
+  };
+
+  const goPreviousDay = () => {
+    globalActions.decrementFoodDiaryDate();
+    fetchFoodDiaryItems(globalState.foodDiaryDate);
+  };
+
+  const goNextDay = () => {
+    globalActions.incrementFoodDiaryDate();
+    fetchFoodDiaryItems(globalState.foodDiaryDate);
+  };
 
   const deleteFoodItem = (id) => {
     console.log("Delete food item with id " + id);
     FoodService.deleteFoodItemFromDiary(id).then(
       (response) => {
         console.log(JSON.stringify(response.data));
-        fetchFoodDiaryItems(dateString);
+        fetchFoodDiaryItems(globalState.foodDiaryDate);
       },
       (error) => {
         alert(error.toString());
@@ -61,27 +71,29 @@ const FoodDiary = (props) => {
     );
   };
 
+  const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+  console.log("globalState.foodDiaryDate: " + globalState.foodDiaryDate);
   return (
 
     <div className="container">
-
       <div>
         <span>Food Diary:</span>
-        <IconButton aria-label="previous day" className={classes.iconButton}>
+        <IconButton aria-label="previous day" className={classes.iconButton} onClick={() => goPreviousDay()}>
         <ArrowLeftIcon fontSize="large"/>
         </IconButton>
-        <span>{date.toLocaleDateString('en-us')}</span>
-        <IconButton aria-label="previous day" className={classes.iconButton}>
+        <span>{globalState.foodDiaryDate.toLocaleDateString('en-us', dateOptions)}</span>
+        <IconButton aria-label="previous day" className={classes.iconButton} onClick={() => goNextDay()}>
         <ArrowRightIcon fontSize="large"/>
         </IconButton>
       </div>
-      <DiaryMeal foodItems={breakfastItems} meal={mealTypes.BREAKFAST} dateString={dateString} deleteFoodItemAction={deleteFoodItem}/>
+      <DiaryMeal foodItems={breakfastItems} meal={mealTypes.BREAKFAST} date={globalState.foodDiaryDate} deleteFoodItemAction={deleteFoodItem}/>
       <FoodDiaryDivider/>
-      <DiaryMeal foodItems={lunchItems} meal={mealTypes.LUNCH} dateString={dateString} deleteFoodItemAction={deleteFoodItem}/>
+      <DiaryMeal foodItems={lunchItems} meal={mealTypes.LUNCH} date={globalState.foodDiaryDate} deleteFoodItemAction={deleteFoodItem}/>
       <FoodDiaryDivider/>
-      <DiaryMeal foodItems={dinnerItems} meal={mealTypes.DINNER} dateString={dateString} deleteFoodItemAction={deleteFoodItem}/>
+      <DiaryMeal foodItems={dinnerItems} meal={mealTypes.DINNER} date={globalState.foodDiaryDate} deleteFoodItemAction={deleteFoodItem}/>
       <FoodDiaryDivider/>
-      <DiaryMeal foodItems={snackItems} meal={mealTypes.SNACKS} dateString={dateString} deleteFoodItemAction={deleteFoodItem}/>
+      <DiaryMeal foodItems={snackItems} meal={mealTypes.SNACKS} date={globalState.foodDiaryDate} deleteFoodItemAction={deleteFoodItem}/>
       <FoodDiaryDivider/>
       <TableContainer component={Paper} style={{width: 600}}>
         <Table className={classes.table} aria-label="simple table">
