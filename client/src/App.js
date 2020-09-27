@@ -13,17 +13,13 @@ import FoodDiary from "./components/FoodDiary";
 import AddNewFood from "./components/AddNewFood";
 import AddFoodToDiary from "./components/AddFoodToDiary"
 
-
 const App = () => {
-
   const [currentUser, setCurrentUser] = useState(undefined);
 
   useEffect(() => {
     const user = AuthService.getCurrentUser();
-
     if (user) {
       setCurrentUser(user);
-;
     }
   }, []);
 
@@ -43,18 +39,10 @@ const App = () => {
               Home
             </Link>
           </li>
-
-          {currentUser && (
-            <li className="nav-item">
-              <Link to={"/user"} className="nav-link">
-                User
-              </Link>
-            </li>
-          )}
           {currentUser && (
             <li className="nav-item">
               <Link to={"/Food"} className="nav-link">
-                Food
+                Food Diary
               </Link>
             </li>
           )}
@@ -66,9 +54,7 @@ const App = () => {
             </li>
           )}
 
-
         </div>
-
         {currentUser ? (
           <div className="navbar-nav ml-auto">
             <li className="nav-item">
@@ -108,7 +94,6 @@ const App = () => {
           <Route exact path="/profile" component={Profile} />
           <Route path="/food" component={FoodDiary} />
           <Route path="/addNewFood" component={AddNewFood} />
-
           <Route path="/addFoodToDiary" component={AddFoodToDiary}/>
         </Switch>
       </div>

@@ -5,4 +5,11 @@ export const mealTypes = {
   SNACKS: 'Snacks'
 };
 
+export const cellWidths = {
+  DESCRIPTION: '400px',
+  CALORIES: '100px'
+};
+
+
+
 

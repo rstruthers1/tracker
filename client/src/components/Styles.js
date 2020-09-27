@@ -10,6 +10,9 @@ const useStyles = makeStyles({
   iconButton: {
     padding: 2
   },
+  h1: {
+    fontSize: '1.5rem'
+  },
   h2: {
     fontSize: '1rem'
   },

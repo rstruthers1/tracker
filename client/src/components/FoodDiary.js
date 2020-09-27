@@ -11,7 +11,11 @@ import DiaryMeal from './DiaryMeal';
 import FoodDiaryUtils from '../utils/food.diary.utils'
 import Styles from './Styles';
 import FoodHeaderTableCell from "./FoodHeaderTableCell";
-import {mealTypes} from "../utils/tracker.constants";
+import {mealTypes, cellWidths} from "../utils/tracker.constants";
+import FoodDiaryDivider from "./FoodDiaryDivider";
+import ArrowLeftIcon from '@material-ui/icons/ArrowLeft';
+import ArrowRightIcon from '@material-ui/icons/ArrowRight';
+import IconButton from "@material-ui/core/IconButton";
 
 let date = new Date();
 
@@ -23,7 +27,7 @@ const FoodDiary = (props) => {
   const [snackItems, setSnackItems] = useState("");
 
   const classes = Styles.useStyles();
-  let dateString = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
+  let dateString = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
 
   useEffect(() => {
     fetchFoodDiaryItems(dateString);
@@ -61,33 +65,37 @@ const FoodDiary = (props) => {
 
     <div className="container">
 
-      <h1>Food Diary</h1>
-      <div>Date: {date.toLocaleDateString('en-us')}</div>
-      <h2 className={classes.h2}>{mealTypes.BREAKFAST}</h2>
+      <div>
+        <span>Food Diary:</span>
+        <IconButton aria-label="previous day" className={classes.iconButton}>
+        <ArrowLeftIcon fontSize="large"/>
+        </IconButton>
+        <span>{date.toLocaleDateString('en-us')}</span>
+        <IconButton aria-label="previous day" className={classes.iconButton}>
+        <ArrowRightIcon fontSize="large"/>
+        </IconButton>
+      </div>
       <DiaryMeal foodItems={breakfastItems} meal={mealTypes.BREAKFAST} dateString={dateString} deleteFoodItemAction={deleteFoodItem}/>
-      <div style={{paddingBottom: "10px"}}></div>
-      <h2 className={classes.h2}>{mealTypes.LUNCH}</h2>
+      <FoodDiaryDivider/>
       <DiaryMeal foodItems={lunchItems} meal={mealTypes.LUNCH} dateString={dateString} deleteFoodItemAction={deleteFoodItem}/>
-      <div style={{paddingBottom: "10px"}}></div>
-      <h2 className={classes.h2}>{mealTypes.DINNER}</h2>
+      <FoodDiaryDivider/>
       <DiaryMeal foodItems={dinnerItems} meal={mealTypes.DINNER} dateString={dateString} deleteFoodItemAction={deleteFoodItem}/>
-      <div style={{paddingBottom: "10px"}}></div>
-      <h2 className={classes.h2}>{mealTypes.SNACKS}</h2>
+      <FoodDiaryDivider/>
       <DiaryMeal foodItems={snackItems} meal={mealTypes.SNACKS} dateString={dateString} deleteFoodItemAction={deleteFoodItem}/>
-      <div style={{paddingBottom: "10px"}}></div>
+      <FoodDiaryDivider/>
       <TableContainer component={Paper} style={{width: 600}}>
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <FoodHeaderTableCell className={classes.tableCell}>Totals</FoodHeaderTableCell>
-              <FoodHeaderTableCell align="right" className={classes.tableCell}>Calories</FoodHeaderTableCell>
+              <FoodHeaderTableCell className={classes.tableCell} style={{width: cellWidths.DESCRIPTION}}> Totals</FoodHeaderTableCell>
+              <FoodHeaderTableCell align="right" className={classes.tableCell} style={{width: cellWidths.CALORIES}}>Calories</FoodHeaderTableCell>
               <FoodHeaderTableCell align="right" className={classes.tableCell}></FoodHeaderTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
               <TableRow>
                 <TableCell className={classes.tableCell}></TableCell>
-                <TableCell align="right" className={classes.tableCell} >{
+                <TableCell align="right" className={classes.tableCell}>{
                   FoodDiaryUtils.sumCalories(breakfastItems) +
                   FoodDiaryUtils.sumCalories(lunchItems) +
                   FoodDiaryUtils.sumCalories(dinnerItems) +

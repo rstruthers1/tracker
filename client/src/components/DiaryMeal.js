@@ -12,6 +12,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import FoodHeaderTableCell from "./FoodHeaderTableCell";
 import FoodDiaryUtils from '../utils/food.diary.utils';
 import Styles from './Styles';
+import {cellWidths} from "../utils/tracker.constants";
 
 const DiaryMeal = (props) => {
   const classes = Styles.useStyles();
@@ -25,8 +26,8 @@ const DiaryMeal = (props) => {
       <Table className={classes.table} aria-label="simple table">
         <TableHead>
           <TableRow>
-            <FoodHeaderTableCell style={{width: 400}} className={classes.tableCell}>Food</FoodHeaderTableCell>
-            <FoodHeaderTableCell align="right" style={{width: 100}} className={classes.tableCell}>Calories</FoodHeaderTableCell>
+            <FoodHeaderTableCell style={{width: cellWidths.DESCRIPTION}} className={classes.tableCell}>{meal}</FoodHeaderTableCell>
+            <FoodHeaderTableCell align="right" style={{width: cellWidths.CALORIES}} className={classes.tableCell}>Calories</FoodHeaderTableCell>
             <FoodHeaderTableCell align="right" className={classes.tableCell}></FoodHeaderTableCell>
           </TableRow>
         </TableHead>
@@ -38,9 +39,11 @@ const DiaryMeal = (props) => {
               </TableCell>
               <TableCell align="right" className={classes.tableCell}>{row.calories}</TableCell>
               <TableCell align="center" className={classes.tableCell}>
-                <IconButton aria-label="delete" className={classes.iconButton} onClick={(event) => {
-                deleteFoodItemAction(event.currentTarget.id)
-              }} id={row.id}>
+                <IconButton
+                  aria-label="delete"
+                  className={classes.iconButton}
+                  onClick={(event) => {deleteFoodItemAction(event.currentTarget.id)}}
+                  id={row.id}>
                 <DeleteIcon/>
               </IconButton>
               </TableCell>
