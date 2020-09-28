@@ -7,7 +7,7 @@ const Op = db.Sequelize.Op;
 
 exports.foodDiary = (req, res) => {
   console.log("food.diary.controller");
-  db.sequelize.query("SELECT fdi.id, fdi.meal, fdi.date, " +
+  db.sequelize.query("SELECT fdi.id, fdi.meal, fdi.date, fdi.servings, " +
     "f.description, f.calories, f.servingSize " +
     "from food_diary_items fdi " +
     "join foods f on fdi.foodId = f.id " +
@@ -56,11 +56,9 @@ exports.foodSubmitted = (req, res) => {
 };
 
 exports.getAllFoods = (req, res) => {
-  console.log("**** getAllFoods");
   Food.findAll({
     order: [['description', 'ASC']]
   }).then(foods => {
-    console.log(JSON.stringify(foods));
     res.status(200).send(foods);
   }).catch(err => {
     res.status(500).send("error getting all the foods")
@@ -68,10 +66,6 @@ exports.getAllFoods = (req, res) => {
 };
 
 exports.addFoodsToDiary = (req, res) => {
-  console.log("*** addFoodsToDiary");
-  console.log(JSON.stringify(req.body));
-  console.log(req.body.foodIds);
-  console.log("User id: " + req.userId);
   let foodItemsToAdd = [];
   req.body.foodIds.forEach((id) => {
     foodItemsToAdd.push({
@@ -83,7 +77,6 @@ exports.addFoodsToDiary = (req, res) => {
   });
   FoodDiaryItem.bulkCreate( foodItemsToAdd
   ).then(() => {
-
     res.status(200).send("success adding foods (to be implemented)");
   }).catch(err => {
     res.status(500).send("error getting all the foods")

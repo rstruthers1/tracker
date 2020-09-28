@@ -14,6 +14,9 @@ module.exports = (sequelize, Sequelize) => {
     date: {
       type: DataTypes.DATEONLY
     },
+    servings: {
+      type: DataTypes.DECIMAL(12,6)
+    },
     foodId: {
       type: DataTypes.INTEGER,
       references: {

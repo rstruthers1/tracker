@@ -14,12 +14,8 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
-import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
-import DeleteIcon from '@material-ui/icons/Delete';
-import FilterListIcon from '@material-ui/icons/FilterList';
 import { ThemeProvider } from '@material-ui/styles';
 
 import { useHistory } from 'react-router-dom';
@@ -182,7 +178,6 @@ const useStyles = makeStyles((theme) => ({
 
   },
   paper: {
-    width: '600px',
     marginBottom: theme.spacing(2),
   },
   table: {
@@ -395,7 +390,7 @@ const AddFoodToDiary = (props) => {
                             />
                           </TableCell>
                           <TableCell component="th" id={labelId} scope="row" padding="none">
-                            {row.description}
+                            {row.description + ' - ' + row.servingSize}
                           </TableCell>
                           <TableCell align="right">{row.calories}</TableCell>
                         </TableRow>
@@ -428,7 +423,7 @@ const AddFoodToDiary = (props) => {
       </div>
       <div className="form-group">
         <div className="col-sm-4">
-          <button type="submit"  className="btn btn-primary btn-block" onClick={event => onSubmit(event)}>Add Checked</button>
+          <button type="submit"  style={{backgroundColor: '#00548F'}} className="btn btn-primary btn-block" onClick={event => onSubmit(event)}>Add Checked</button>
         </div>
       </div>
     </div>

@@ -7,7 +7,8 @@ export const mealTypes = {
 
 export const cellWidths = {
   DESCRIPTION: '400px',
-  CALORIES: '100px'
+  CALORIES: '100px',
+  SERVINGS: '100px'
 };
 
 export const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };

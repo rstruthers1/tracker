@@ -34,6 +34,10 @@ const FoodDiary = (props) => {
 
   const fetchFoodDiaryItems = date => {
     let theDateString = FoodDiaryUtils.dateToQueryParamValue(date);
+    setBreakfastItems([]);
+    setLunchItems([]);
+    setDinnerItems([]);
+    setSnackItems([]);
     FoodService.getFoodDiary(theDateString).then(
       (response) => {
         console.log(JSON.stringify(response.data));
@@ -93,17 +97,19 @@ const FoodDiary = (props) => {
       <FoodDiaryDivider/>
       <DiaryMeal foodItems={snackItems} meal={mealTypes.SNACKS} date={globalState.foodDiaryDate} deleteFoodItemAction={deleteFoodItem}/>
       <FoodDiaryDivider/>
-      <TableContainer component={Paper} style={{width: 600}}>
+      <TableContainer component={Paper} >
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
             <TableRow>
               <FoodHeaderTableCell className={classes.tableCell} style={{width: cellWidths.DESCRIPTION}}> Totals</FoodHeaderTableCell>
+              <FoodHeaderTableCell align="right" className={classes.tableCell} style={{width: cellWidths.SERVINGS}}></FoodHeaderTableCell>
               <FoodHeaderTableCell align="right" className={classes.tableCell} style={{width: cellWidths.CALORIES}}>Calories</FoodHeaderTableCell>
               <FoodHeaderTableCell align="right" className={classes.tableCell}></FoodHeaderTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
               <TableRow>
+                <TableCell className={classes.tableCell}></TableCell>
                 <TableCell className={classes.tableCell}></TableCell>
                 <TableCell align="right" className={classes.tableCell}>{
                   FoodDiaryUtils.sumCalories(breakfastItems) +

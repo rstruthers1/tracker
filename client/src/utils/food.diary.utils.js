@@ -29,8 +29,18 @@ const dateToQueryParamValue = date => {
   return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
 };
 
+const formatServings = servings => {
+  console.log("formatServings: " + servings);
+  if (servings) {
+    return Number.parseFloat(servings).toFixed(2);
+  } else {
+    return servings;
+  }
+};
+
 export default {
   sumCalories,
   getMealItems,
-  dateToQueryParamValue
+  dateToQueryParamValue,
+  formatServings
 }

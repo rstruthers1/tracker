@@ -9,7 +9,6 @@ const addFood = (data) => {
 };
 
 const getAllFoods = () => {
-
   return axios.get(API_URL , { headers: authHeader() });
 };
 

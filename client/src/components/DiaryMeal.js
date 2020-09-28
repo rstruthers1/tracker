@@ -23,11 +23,12 @@ const DiaryMeal = (props) => {
   let deleteFoodItemAction = props.deleteFoodItemAction;
 
   return (
-    <TableContainer component={Paper} style={{width: 600}}>
+    <TableContainer component={Paper} >
       <Table className={classes.table} aria-label="simple table">
         <TableHead>
           <TableRow>
             <FoodHeaderTableCell style={{width: cellWidths.DESCRIPTION}} className={classes.tableCell}>{meal}</FoodHeaderTableCell>
+            <FoodHeaderTableCell align="right" style={{width: cellWidths.SERVINGS}} className={classes.tableCell}>Servings</FoodHeaderTableCell>
             <FoodHeaderTableCell align="right" style={{width: cellWidths.CALORIES}} className={classes.tableCell}>Calories</FoodHeaderTableCell>
             <FoodHeaderTableCell align="right" className={classes.tableCell}></FoodHeaderTableCell>
           </TableRow>
@@ -35,10 +36,11 @@ const DiaryMeal = (props) => {
         <TableBody>
           {foodItems ? (foodItems.map((row) => (
             <TableRow key={row.id}>
-              <TableCell className={classes.tableCell}>
-                {row.description}
+              <TableCell className={classes.tableCell} >
+                {row.description + ' - ' + row.servingSize}
               </TableCell>
-              <TableCell align="right" className={classes.tableCell}>{row.calories}</TableCell>
+              <TableCell  align="right" className={classes.tableCell}>{FoodDiaryUtils.formatServings(row.servings)}</TableCell>
+              <TableCell   align="right" className={classes.tableCell}>{row.calories}</TableCell>
               <TableCell align="center" className={classes.tableCell}>
                 <IconButton
                   aria-label="delete"
@@ -57,7 +59,7 @@ const DiaryMeal = (props) => {
                 Add Food
               </Link>
             </TableCell>
-
+            <TableCell></TableCell>
             <TableCell align="right" className={classes.tableCell}>{FoodDiaryUtils.sumCalories(foodItems)}</TableCell>
             <TableCell></TableCell>
           </TableRow>
