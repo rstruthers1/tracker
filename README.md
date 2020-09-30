@@ -45,6 +45,9 @@ https://rms-tracker.herokuapp.com/
 * https://adazzle.github.io/react-data-grid/
 * https://blog.logrocket.com/patterns-for-data-fetching-in-react-981ced7e5c56/
 * https://stackoverflow.com/questions/35582978/best-way-to-filter-table-in-react
+* https://www.pluralsight.com/guides/dynamic-tables-from-editable-columns-in-react-html
+* https://www.freecodecamp.org/news/how-to-build-a-real-time-editable-datagrid-in-react-c13a37b646ec/
+* https://github.com/jbetancur/react-data-table-component
 
 
 

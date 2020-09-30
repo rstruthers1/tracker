@@ -67,12 +67,13 @@ exports.getAllFoods = (req, res) => {
 
 exports.addFoodsToDiary = (req, res) => {
   let foodItemsToAdd = [];
-  req.body.foodIds.forEach((id) => {
+  req.body.foodDiaryData.forEach((foodDiaryItem) => {
     foodItemsToAdd.push({
-      meal: req.body.meal,
-      date: new Date(req.body.foodDiaryDate),
+      meal: foodDiaryItem.meal,
+      date: new Date(foodDiaryItem.date),
       userId: req.userId,
-      foodId: id
+      foodId: foodDiaryItem.foodId,
+      servings: foodDiaryItem.servings ? foodDiaryItem.servings : 1
     })
   });
   FoodDiaryItem.bulkCreate( foodItemsToAdd

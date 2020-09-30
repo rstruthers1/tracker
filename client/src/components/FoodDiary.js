@@ -34,10 +34,7 @@ const FoodDiary = (props) => {
 
   const fetchFoodDiaryItems = date => {
     let theDateString = FoodDiaryUtils.dateToQueryParamValue(date);
-    setBreakfastItems([]);
-    setLunchItems([]);
-    setDinnerItems([]);
-    setSnackItems([]);
+
     FoodService.getFoodDiary(theDateString).then(
       (response) => {
         console.log(JSON.stringify(response.data));

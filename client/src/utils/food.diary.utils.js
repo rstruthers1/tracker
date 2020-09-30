@@ -4,7 +4,7 @@ const sumCalories = (items) => {
   }
   let sum = 0;
   items.forEach(item => {
-    sum += item.calories;
+    sum += (item.calories * item.servings);
   });
   return sum;
 };

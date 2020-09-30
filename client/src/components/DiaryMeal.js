@@ -40,7 +40,7 @@ const DiaryMeal = (props) => {
                 {row.description + ' - ' + row.servingSize}
               </TableCell>
               <TableCell  align="right" className={classes.tableCell}>{FoodDiaryUtils.formatServings(row.servings)}</TableCell>
-              <TableCell   align="right" className={classes.tableCell}>{row.calories}</TableCell>
+              <TableCell   align="right" className={classes.tableCell}>{row.calories * row.servings}</TableCell>
               <TableCell align="center" className={classes.tableCell}>
                 <IconButton
                   aria-label="delete"

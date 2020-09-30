@@ -14,15 +14,15 @@ const getAllFoods = () => {
 
 const addFoodsToDiary = (data) => {
   return axios.post("/api/food/diary", data, { headers: authHeader() })
-}
+};
 
 const getFoodDiary = (date) => {
   return axios.get(`/api/food/diary?date=${date}`,  { headers: authHeader() })
-}
+};
 
 const deleteFoodItemFromDiary = (foodDiaryItemId) => {
   return axios.delete(`/api/food/diary?id=${foodDiaryItemId}`, { headers: authHeader() })
-}
+};
 
 
 export default {

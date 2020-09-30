@@ -25,6 +25,7 @@ import queryString from "query-string";
 import FoodService from "../services/food.service";
 import {dateOptions, addFoodDiary} from "../utils/tracker.constants";
 
+
 const theme = createMuiTheme({
   palette: {
     primary: {
@@ -65,6 +66,7 @@ function stableSort(array, comparator) {
 
 const headCells = [
   { id: 'description', numeric: false, disablePadding: true, label: 'Description' },
+  { id: 'servings', numeric: true, disablePadding: false, label: 'Servings' },
   { id: 'calories', numeric: true, disablePadding: false, label: 'Calories' },
 
 ];
@@ -79,12 +81,12 @@ function EnhancedTableHead(props) {
     <TableHead>
       <TableRow>
         <TableCell padding="checkbox">
-          <Checkbox
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{ 'aria-label': 'select all foods' }}
-          />
+          {/*<Checkbox*/}
+          {/*  indeterminate={numSelected > 0 && numSelected < rowCount}*/}
+          {/*  checked={rowCount > 0 && numSelected === rowCount}*/}
+          {/*  onChange={onSelectAllClick}*/}
+          {/*  inputProps={{ 'aria-label': 'select all foods' }}*/}
+          {/*/>*/}
         </TableCell>
         {headCells.map((headCell) => (
           <TableCell
@@ -207,6 +209,7 @@ const AddFoodToDiary = (props) => {
   const [data, setData] = useState({foods: [], isFetching: false, error: ''});
   const [filterStr, setFilterStr] = React.useState('');
   const [filtered, setFiltered] = React.useState([]);
+  const [servings, setServings] = React.useState([]);
 
   const parsed = queryString.parse(props.history.location.search);
 
@@ -216,18 +219,22 @@ const AddFoodToDiary = (props) => {
   const classes = useStyles();
   const history = useHistory();
 
+
   useEffect(() => {
     setData({foods: data.foods, isFetching: true, error: ''});
     setFiltered(getFoodsMatchingDescription(data.foods, filterStr));
+
     FoodService.getAllFoods().then(
       (response) => {
         console.log(JSON.stringify(response.data));
         setData({foods: response.data, isFetching: false, error: ''});
         setFiltered(getFoodsMatchingDescription(response.data, filterStr));
+
       },
       (error) => {
         setData({foods: data.foods, isFetching: false, error: error.toString()});
         setFiltered(getFoodsMatchingDescription(data.foods, filterStr));
+
       }
     );
   }, []);
@@ -238,15 +245,22 @@ const AddFoodToDiary = (props) => {
       alert(`Please select ${addFoodDiary.MAX_ITEMS_SUBMIT_AT_ONE_TIME} or fewer items to add.`);
       return;
     }
-    if (selected.length > 0) {
+    if (selected.length == 0) {
+      history.push(`/food`)
+    }
+    else {
       const foodsToAdd = [];
       selected.forEach(i => {
-        foodsToAdd.push(i);
+        foodsToAdd.push(
+            {
+              foodId: i,
+              servings: servingsValue(i),
+              meal: parsed.meal,
+              date: parsed.date
+            });
       });
-      const foodDiaryData = {
-        foodIds: foodsToAdd,
-        meal: parsed.meal,
-        foodDiaryDate: parsed.date
+      let foodDiaryData = {
+        foodDiaryData: foodsToAdd
       };
       FoodService.addFoodsToDiary(foodDiaryData).then(
         (response) => {
@@ -292,8 +306,13 @@ const AddFoodToDiary = (props) => {
         selected.slice(selectedIndex + 1),
       );
     }
-
+    console.log("newSelected: " + JSON.stringify(newSelected));
     setSelected(newSelected);
+  };
+
+  const handleServingsChanged = (event, id) => {
+    console.log("handleServingsChanged, food id: " + id);
+    setServingsValue(id, event.target.value);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -311,16 +330,49 @@ const AddFoodToDiary = (props) => {
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
+  const servingsValue = id => {
+    for (let i = 0; i < servings.length; i++) {
+      let serving = servings[i];
+      if (serving.id == id) {
+        return serving.value;
+      }
+    }
+    return "1";
+  };
+
+  const setServingsValue = (id, value) => {
+    let newServings = [];
+    let foundServing = false;
+
+    servings.forEach(serving => {
+      if (serving.id == id) {
+        serving.value = value;
+        foundServing = true;
+      }
+      newServings.push(serving);
+    });
+
+    if (!foundServing) {
+      newServings.push({
+        id: id,
+        value: value
+      })
+    }
+
+    setServings(newServings);
+  };
+
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, filtered.length - page * rowsPerPage);
 
   const getFoodsMatchingDescription = (items, partialDescription) => {
     let matchingItems = [];
-    console.log("getMatchingItems from: " + JSON.stringify(items));
+    //console.log("getMatchingItems from: " + JSON.stringify(items));
     if (!items) {
       return matchingItems;
     }
     items.forEach(food => {
       if (food.description.toLowerCase().includes(partialDescription.toLowerCase())) {
+        food.servings = 1;
         matchingItems.push(food);
       }
     });
@@ -332,9 +384,10 @@ const AddFoodToDiary = (props) => {
     setFilterStr(e.target.value);
     let viewableFoods = getFoodsMatchingDescription (data.foods, e.target.value);
     setFiltered(viewableFoods);
-    console.log("filtered: " + JSON.stringify(filtered));
+    //console.log("filtered: " + JSON.stringify(filtered));
   };
 
+  const handleServingsFocus = (event) => event.target.select();
 
   return(
     <div className="container">
@@ -376,21 +429,35 @@ const AddFoodToDiary = (props) => {
                       return (
                         <TableRow
                           hover
-                          onClick={(event) => handleClick(event, row.id)}
+
                           role="checkbox"
                           aria-checked={isItemSelected}
                           tabIndex={-1}
                           key={row.id}
-                          selected={isItemSelected}
+
                         >
                           <TableCell padding="checkbox">
                             <Checkbox
                               checked={isItemSelected}
                               inputProps={{ 'aria-labelledby': labelId }}
+                              onClick={(event) => handleClick(event, row.id)}
+                              key={row.id}
+                              selected={isItemSelected}
                             />
                           </TableCell>
                           <TableCell component="th" id={labelId} scope="row" padding="none">
                             {row.description + ' - ' + row.servingSize}
+                          </TableCell>
+                          <TableCell align="right">
+                              <input
+                              type="text"
+                              id={row.id}
+                              style={{textAlign: "right", width: '50px'}}
+                              value={servingsValue(row.id)}
+                              onChange={event => handleServingsChanged(event, row.id)}
+                              onFocus={event => handleServingsFocus(event)}
+                            />
+
                           </TableCell>
                           <TableCell align="right">{row.calories}</TableCell>
                         </TableRow>
@@ -417,7 +484,7 @@ const AddFoodToDiary = (props) => {
           </ThemeProvider>
           <FormControlLabel
             control={<Switch checked={dense} onChange={handleChangeDense} />}
-            label="Dense padding"
+            label="Compact Table"
           />
         </div>
       </div>
