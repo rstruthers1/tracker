@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {Link} from 'react-router-dom';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -9,10 +9,16 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
+import Tooltip from '@material-ui/core/Tooltip'
+
+import Button from 'react-bootstrap/Button'
+import Modal from 'react-bootstrap/Modal'
+
 import FoodHeaderTableCell from "./FoodHeaderTableCell";
 import FoodDiaryUtils from '../utils/food.diary.utils';
 import Styles from './Styles';
 import {cellWidths} from "../utils/tracker.constants";
+import EditFoodDiaryEntry from "./EditFoodDiaryEntry";
 
 
 const DiaryMeal = (props) => {
@@ -21,6 +27,32 @@ const DiaryMeal = (props) => {
   let meal = props.meal;
   let date = props.date;
   let deleteFoodItemAction = props.deleteFoodItemAction;
+  let updateFoodDiaryItem = props.updateFoodDiaryItem;
+
+  const [show, setShow] = useState(false);
+  const [editRow, setEditRow] = useState(null);
+
+  const handleClose = () => setShow(false);
+
+  function editEntry(event, foodDiaryItem) {
+    setEditRow({...foodDiaryItem, servings: FoodDiaryUtils.formatServings(foodDiaryItem.servings)});
+    setShow(true);
+  }
+
+  const editRowChanged = (event, whichItem) => {
+    let newEditRow = {
+      ...editRow,
+    };
+    newEditRow[whichItem] = event.target.value;
+    console.log("newEditRow: " + JSON.stringify(newEditRow));
+    setEditRow(newEditRow);
+  };
+
+  const saveFoodItemChanges = foodDiaryItem => {
+    setShow(false);
+    updateFoodDiaryItem(foodItems);
+  };
+
 
   return (
     <TableContainer component={Paper} >
@@ -36,12 +68,17 @@ const DiaryMeal = (props) => {
         <TableBody>
           {foodItems ? (foodItems.map((row) => (
             <TableRow key={row.id}>
-              <TableCell className={classes.tableCell} >
+              <TableCell className={classes.descriptionCell}>
+                <Tooltip title="Edit entry">
+                <span onClick={event => {editEntry(event, row)}}>
                 {row.description + ' - ' + row.servingSize}
+                </span>
+                </Tooltip>
               </TableCell>
               <TableCell  align="right" className={classes.tableCell}>{FoodDiaryUtils.formatServings(row.servings)}</TableCell>
               <TableCell   align="right" className={classes.tableCell}>{row.calories * row.servings}</TableCell>
               <TableCell align="center" className={classes.tableCell}>
+                <Tooltip title="Delete entry">
                 <IconButton
                   aria-label="delete"
                   className={classes.iconButton}
@@ -49,6 +86,7 @@ const DiaryMeal = (props) => {
                   id={row.id}>
                 <DeleteIcon/>
               </IconButton>
+                </Tooltip>
               </TableCell>
             </TableRow>
           ))) : (<TableRow><TableCell className={classes.tableCell}>Loading...</TableCell></TableRow>)}
@@ -65,7 +103,25 @@ const DiaryMeal = (props) => {
           </TableRow>
         </TableBody>
       </Table>
+
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>{editRow && editRow.description}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <EditFoodDiaryEntry foodDiaryItem={editRow} foodItemChanged={editRowChanged}/>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={event => saveFoodItemChanges(editRow)}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </TableContainer>
+
   )
 
 };

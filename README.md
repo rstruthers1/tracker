@@ -49,6 +49,10 @@ https://rms-tracker.herokuapp.com/
 * https://www.freecodecamp.org/news/how-to-build-a-real-time-editable-datagrid-in-react-c13a37b646ec/
 * https://github.com/jbetancur/react-data-table-component
 
+### Form dialogs
+* https://material-ui.com/components/dialogs/#form-dialogs
+* https://blog.bitsrc.io/build-a-full-featured-modal-dialog-form-with-react-651dcef6c571
+
 
 
 

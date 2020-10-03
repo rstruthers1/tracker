@@ -17,7 +17,12 @@ const useStyles = makeStyles({
     fontSize: '1rem'
   },
   descriptionCell: {
-    width: '400'
+    width: '400',
+    cursor: 'pointer',
+    "&:hover": {
+      color: '#007bff;'
+    },
+    padding: 6
   }
 });
 

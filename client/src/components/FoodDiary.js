@@ -72,6 +72,10 @@ const FoodDiary = (props) => {
     );
   };
 
+  const updateFoodDiaryItem = foodDiaryItem => {
+    alert("save this row: " + JSON.stringify(foodDiaryItem));
+  };
+
   console.log("globalState.foodDiaryDate: " + globalState.foodDiaryDate);
   return (
 
@@ -86,13 +90,37 @@ const FoodDiary = (props) => {
         <ArrowRightIcon fontSize="large"/>
         </IconButton>
       </div>
-      <DiaryMeal foodItems={breakfastItems} meal={mealTypes.BREAKFAST} date={globalState.foodDiaryDate} deleteFoodItemAction={deleteFoodItem}/>
+      <DiaryMeal
+        foodItems={breakfastItems}
+        meal={mealTypes.BREAKFAST}
+        date={globalState.foodDiaryDate}
+        deleteFoodItemAction={deleteFoodItem}
+        updateFoodDiaryItem={updateFoodDiaryItem}
+      />
       <FoodDiaryDivider/>
-      <DiaryMeal foodItems={lunchItems} meal={mealTypes.LUNCH} date={globalState.foodDiaryDate} deleteFoodItemAction={deleteFoodItem}/>
+      <DiaryMeal
+        foodItems={lunchItems}
+        meal={mealTypes.LUNCH}
+        date={globalState.foodDiaryDate}
+        deleteFoodItemAction={deleteFoodItem}
+        updateFoodDiaryItem={updateFoodDiaryItem}
+      />
       <FoodDiaryDivider/>
-      <DiaryMeal foodItems={dinnerItems} meal={mealTypes.DINNER} date={globalState.foodDiaryDate} deleteFoodItemAction={deleteFoodItem}/>
+      <DiaryMeal
+        foodItems={dinnerItems}
+         meal={mealTypes.DINNER}
+         date={globalState.foodDiaryDate}
+         deleteFoodItemAction={deleteFoodItem}
+         updateFoodDiaryItem={updateFoodDiaryItem}
+      />
       <FoodDiaryDivider/>
-      <DiaryMeal foodItems={snackItems} meal={mealTypes.SNACKS} date={globalState.foodDiaryDate} deleteFoodItemAction={deleteFoodItem}/>
+      <DiaryMeal
+        foodItems={snackItems}
+        meal={mealTypes.SNACKS}
+        date={globalState.foodDiaryDate}
+        deleteFoodItemAction={deleteFoodItem}
+        updateFoodDiaryItem={updateFoodDiaryItem}
+      />
       <FoodDiaryDivider/>
       <TableContainer component={Paper} >
         <Table className={classes.table} aria-label="simple table">
