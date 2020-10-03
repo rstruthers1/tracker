@@ -50,7 +50,7 @@ const DiaryMeal = (props) => {
 
   const saveFoodItemChanges = foodDiaryItem => {
     setShow(false);
-    updateFoodDiaryItem(foodItems);
+    updateFoodDiaryItem(foodDiaryItem);
   };
 
 

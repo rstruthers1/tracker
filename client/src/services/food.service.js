@@ -24,11 +24,16 @@ const deleteFoodItemFromDiary = (foodDiaryItemId) => {
   return axios.delete(`/api/food/diary?id=${foodDiaryItemId}`, { headers: authHeader() })
 };
 
+const updateFoodDiaryItem = (data) => {
+  return axios.put(`/api/food/diary`, data,{ headers: authHeader() })
+};
+
 
 export default {
   addFood,
   getAllFoods,
   addFoodsToDiary,
   getFoodDiary,
-  deleteFoodItemFromDiary
+  deleteFoodItemFromDiary,
+  updateFoodDiaryItem
 };

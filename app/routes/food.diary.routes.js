@@ -41,5 +41,11 @@ module.exports = function(app) {
     controller.deleteFoodDiaryItem
   );
 
+  app.put(
+    "/api/food/diary",
+    [authJwt.verifyToken],
+    controller.updateFoodDiaryItem
+  )
+
 
 };

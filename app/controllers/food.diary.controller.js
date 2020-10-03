@@ -34,8 +34,25 @@ exports.deleteFoodDiaryItem = (req, res) => {
     res.status(200).send("delete food diary item response");
   }).catch(err => {
     console.log(JSON.stringify(err));
-    res.status(500).send("deleting food items")
+    res.status(500).send("error deleting food item")
   });
+};
+
+exports.updateFoodDiaryItem = (req, res) => {
+  console.log("updateFoodDiaryItem: " + JSON.stringify(req.body));
+  FoodDiaryItem.update(
+    {servings: req.body.servings},
+    {
+    where: {
+      id: req.body.id
+    }
+  }).then(() => {
+    res.status(200).send("update food diary item response");
+  }).catch(err => {
+    console.log(JSON.stringify(err));
+    res.status(500).send("error updating food diary item")
+  });
+
 };
 
 

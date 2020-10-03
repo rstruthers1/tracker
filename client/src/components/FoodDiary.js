@@ -73,7 +73,15 @@ const FoodDiary = (props) => {
   };
 
   const updateFoodDiaryItem = foodDiaryItem => {
-    alert("save this row: " + JSON.stringify(foodDiaryItem));
+    FoodService.updateFoodDiaryItem(foodDiaryItem).then(
+      (response) => {
+        console.log(JSON.stringify(response.data));
+        fetchFoodDiaryItems(globalState.foodDiaryDate);
+      },
+      (error) => {
+        alert(error.toString());
+      }
+    );
   };
 
   console.log("globalState.foodDiaryDate: " + globalState.foodDiaryDate);
