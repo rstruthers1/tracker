@@ -226,9 +226,9 @@ const AddFoodToDiary = (props) => {
 
     FoodService.getAllFoods().then(
       (response) => {
-        console.log(JSON.stringify(response.data));
         setData({foods: response.data, isFetching: false, error: ''});
         setFiltered(getFoodsMatchingDescription(response.data, filterStr));
+        console.log("Got data from server! " + JSON.stringify(data.isFetching));
 
       },
       (error) => {
@@ -237,7 +237,7 @@ const AddFoodToDiary = (props) => {
 
       }
     );
-  }, [data.foods, filterStr]);
+  }, []);
 
   const onSubmit = event => {
     console.log(JSON.stringify(selected));
