@@ -113,7 +113,7 @@ const FoodDiary = (props) => {
         meal={mealTypes.BREAKFAST}
         date={globalState.foodDiaryDate}
         deleteFoodItemAction={deleteFoodItem}
-        updateFoodDiaryItem={updateFoodDiaryItem}
+        updateFoodItem={updateFoodDiaryItem}
       />
       <FoodDiaryDivider/>
       <DiaryMeal
@@ -121,7 +121,7 @@ const FoodDiary = (props) => {
         meal={mealTypes.LUNCH}
         date={globalState.foodDiaryDate}
         deleteFoodItemAction={deleteFoodItem}
-        updateFoodDiaryItem={updateFoodDiaryItem}
+        updateFoodItem={updateFoodDiaryItem}
       />
       <FoodDiaryDivider/>
       <DiaryMeal
@@ -129,7 +129,7 @@ const FoodDiary = (props) => {
          meal={mealTypes.DINNER}
          date={globalState.foodDiaryDate}
          deleteFoodItemAction={deleteFoodItem}
-         updateFoodDiaryItem={updateFoodDiaryItem}
+         updateFoodItem={updateFoodDiaryItem}
       />
       <FoodDiaryDivider/>
       <DiaryMeal
@@ -137,7 +137,7 @@ const FoodDiary = (props) => {
         meal={mealTypes.SNACKS}
         date={globalState.foodDiaryDate}
         deleteFoodItemAction={deleteFoodItem}
-        updateFoodDiaryItem={updateFoodDiaryItem}
+        updateFoodItem={updateFoodDiaryItem}
       />
       <FoodDiaryDivider/>
       <TableContainer component={Paper} >

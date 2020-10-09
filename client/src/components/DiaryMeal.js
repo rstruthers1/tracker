@@ -21,13 +21,8 @@ import {cellWidths} from "../utils/tracker.constants";
 import EditFoodDiaryEntry from "./EditFoodDiaryEntry";
 
 
-const DiaryMeal = (props) => {
+const DiaryMeal = ({foodItems, meal, date, deleteFoodItemAction, updateFoodItem}) => {
   const classes = Styles.useStyles();
-  let foodItems = props.foodItems;
-  let meal = props.meal;
-  let date = props.date;
-  let deleteFoodItemAction = props.deleteFoodItemAction;
-  let updateFoodDiaryItem = props.updateFoodDiaryItem;
 
   const [show, setShow] = useState(false);
   const [editRow, setEditRow] = useState(null);
@@ -50,7 +45,7 @@ const DiaryMeal = (props) => {
 
   const saveFoodItemChanges = foodDiaryItem => {
     setShow(false);
-    updateFoodDiaryItem(foodDiaryItem);
+    updateFoodItem(foodDiaryItem);
   };
 
 
