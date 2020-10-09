@@ -23,6 +23,10 @@ const useStyles = makeStyles({
       color: '#007bff;'
     },
     padding: 6
+  },
+  backdrop: {
+    zIndex: 5000,
+    color: '#fff',
   }
 });
 

@@ -30,7 +30,6 @@ const dateToQueryParamValue = date => {
 };
 
 const formatServings = servings => {
-  console.log("formatServings: " + servings);
   if (servings) {
     return Number.parseFloat(servings).toFixed(2);
   } else {

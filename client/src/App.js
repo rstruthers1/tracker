@@ -12,6 +12,8 @@ import Profile from "./components/Profile";
 import FoodDiary from "./components/FoodDiary";
 import AddNewFood from "./components/AddNewFood";
 import AddFoodToDiary from "./components/AddFoodToDiary"
+import AddRecipe from "./components/AddRecipe";
+
 
 const App = () => {
   const [currentUser, setCurrentUser] = useState(undefined);
@@ -53,7 +55,13 @@ const App = () => {
               </Link>
             </li>
           )}
-
+          {currentUser && (
+            <li className="nav-item">
+              <Link to={"/addRecipe"} className="nav-link">
+                Add Recipe
+              </Link>
+            </li>
+          )}
         </div>
         {currentUser ? (
           <div className="navbar-nav ml-auto">
@@ -95,6 +103,7 @@ const App = () => {
           <Route path="/food" component={FoodDiary} />
           <Route path="/addNewFood" component={AddNewFood} />
           <Route path="/addFoodToDiary" component={AddFoodToDiary}/>
+          <Route path="/addRecipe" component={AddRecipe}/>
         </Switch>
       </div>
     </div>

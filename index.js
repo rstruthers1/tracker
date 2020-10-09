@@ -46,6 +46,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 require('./app/routes/auth.routes')(app);
 require('./app/routes/user.routes')(app);
 require('./app/routes/food.diary.routes')(app);
+require('./app/routes/recipe.routes')(app);
 
 
 // simple route

@@ -72,7 +72,7 @@ const headCells = [
 ];
 
 function EnhancedTableHead(props) {
-  const { classes, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
+  const { classes, order, orderBy, onRequestSort } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -237,7 +237,7 @@ const AddFoodToDiary = (props) => {
 
       }
     );
-  }, []);
+  }, [data.foods, filterStr]);
 
   const onSubmit = event => {
     console.log(JSON.stringify(selected));
@@ -245,7 +245,7 @@ const AddFoodToDiary = (props) => {
       alert(`Please select ${addFoodDiary.MAX_ITEMS_SUBMIT_AT_ONE_TIME} or fewer items to add.`);
       return;
     }
-    if (selected.length == 0) {
+    if (selected.length === 0) {
       history.push(`/food`)
     }
     else {
@@ -333,7 +333,7 @@ const AddFoodToDiary = (props) => {
   const servingsValue = id => {
     for (let i = 0; i < servings.length; i++) {
       let serving = servings[i];
-      if (serving.id == id) {
+      if (serving.id === id) {
         return serving.value;
       }
     }
@@ -345,7 +345,7 @@ const AddFoodToDiary = (props) => {
     let foundServing = false;
 
     servings.forEach(serving => {
-      if (serving.id == id) {
+      if (serving.id === id) {
         serving.value = value;
         foundServing = true;
       }

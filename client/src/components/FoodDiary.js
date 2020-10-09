@@ -6,6 +6,10 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
+
 import FoodService from "../services/food.service";
 import DiaryMeal from './DiaryMeal';
 import FoodDiaryUtils from '../utils/food.diary.utils'
@@ -25,12 +29,14 @@ const FoodDiary = (props) => {
   const [lunchItems, setLunchItems] = useState("");
   const [dinnerItems, setDinnerItems] = useState("");
   const [snackItems, setSnackItems] = useState("");
+  const [open, setOpen] = useState(false);
+
 
   const classes = Styles.useStyles();
 
   useEffect(() => {
     fetchFoodDiaryItems(globalState.foodDiaryDate);
-  }, []);
+  }, [globalState.foodDiaryDate]);
 
   const fetchFoodDiaryItems = date => {
     let theDateString = FoodDiaryUtils.dateToQueryParamValue(date);
@@ -73,16 +79,20 @@ const FoodDiary = (props) => {
   };
 
   const updateFoodDiaryItem = foodDiaryItem => {
+    setOpen(true);
     FoodService.updateFoodDiaryItem(foodDiaryItem).then(
       (response) => {
         console.log(JSON.stringify(response.data));
         fetchFoodDiaryItems(globalState.foodDiaryDate);
+        setOpen(false);
       },
       (error) => {
         alert(error.toString());
+        setOpen(false);
       }
     );
   };
+
 
   console.log("globalState.foodDiaryDate: " + globalState.foodDiaryDate);
   return (
@@ -156,6 +166,9 @@ const FoodDiary = (props) => {
         </Table>
       </TableContainer>
       <div style={{paddingBottom: "40px"}}></div>
+      <Backdrop className={classes.backdrop} open={open}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </div>
   )
 };

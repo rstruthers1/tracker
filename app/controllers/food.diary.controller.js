@@ -38,15 +38,16 @@ exports.deleteFoodDiaryItem = (req, res) => {
   });
 };
 
+
 exports.updateFoodDiaryItem = (req, res) => {
   console.log("updateFoodDiaryItem: " + JSON.stringify(req.body));
   FoodDiaryItem.update(
     {servings: req.body.servings},
     {
-    where: {
-      id: req.body.id
-    }
-  }).then(() => {
+      where: {
+        id: req.body.id
+      }
+    }).then(() => {
     res.status(200).send("update food diary item response");
   }).catch(err => {
     console.log(JSON.stringify(err));

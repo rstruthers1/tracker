@@ -17,7 +17,7 @@ const AddNewFood = (props) => {
         alert(JSON.stringify(error));
       }
     );
-  }
+  };
 
   return (
 
