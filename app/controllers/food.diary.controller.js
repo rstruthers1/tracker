@@ -2,6 +2,7 @@ const db = require("../models");
 const Food = db.food;
 const FoodDiaryItem = db.foodDiaryItem;
 const { QueryTypes } = require('sequelize');
+const Utils = require('../utils/utils');
 
 const Op = db.Sequelize.Op;
 
@@ -88,7 +89,7 @@ exports.addFoodsToDiary = (req, res) => {
   req.body.foodDiaryData.forEach((foodDiaryItem) => {
     foodItemsToAdd.push({
       meal: foodDiaryItem.meal,
-      date: new Date(foodDiaryItem.date),
+      date: Utils.parseDate(foodDiaryItem.date),
       userId: req.userId,
       foodId: foodDiaryItem.foodId,
       servings: foodDiaryItem.servings ? foodDiaryItem.servings : 1

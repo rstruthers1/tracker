@@ -24,6 +24,7 @@ import queryString from "query-string";
 
 import FoodService from "../services/food.service";
 import {dateOptions, addFoodDiary} from "../utils/tracker.constants";
+import FoodDiaryUtils from '../utils/food.diary.utils'
 
 
 const theme = createMuiTheme({
@@ -212,8 +213,8 @@ const AddFoodToDiary = (props) => {
   const [servings, setServings] = React.useState([]);
 
   const parsed = queryString.parse(props.history.location.search);
-
-  let date = new Date(parsed.date);
+  
+  let date = FoodDiaryUtils.parseDate(parsed.date);
   let meal = parsed.meal;
 
   const classes = useStyles();
