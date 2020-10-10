@@ -70,4 +70,11 @@ label {
   border-radius: 50%;
 }
 
+.error {
+  display: inline;
+  content: "⚠ ";
+  color: #bf1650;
+  font-weight: bold;
+}
+
 
