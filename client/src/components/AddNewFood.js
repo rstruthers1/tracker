@@ -3,8 +3,10 @@ import { useForm} from "react-hook-form";
 import FoodService from "../services/food.service";
 
 
+
 const AddNewFood = (props) => {
   const { register, reset, handleSubmit } = useForm();
+  
   const onSubmit = data => {
     console.log(data);
     FoodService.addFood(data).then(

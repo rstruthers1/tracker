@@ -67,7 +67,7 @@ exports.foodSubmitted = (req, res) => {
     servingSize: req.body.servingSize,
     calories: req.body.calories
   }). then(food => {
-    res.status(200).send({message: "Food was created successfully!"});
+    res.status(200).send(food);
   }).catch( err => {
     res.status(500).send({ message: err.message });
   })

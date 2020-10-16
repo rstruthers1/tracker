@@ -1,12 +1,17 @@
 import React, {useState, useEffect} from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm} from "react-hook-form";
 import useGlobal from "../store";
-import {cellWidths} from "../utils/tracker.constants";
+import {recipeCellWidths} from "../utils/tracker.constants";
 import Table from 'react-bootstrap/Table';
 import _ from "lodash/fp";
-import AsyncSelect from 'react-select/async';
+import AsyncCreatableSelect from 'react-select/async-creatable';
 import FoodService from "../services/food.service";
 import {v4 as uuidv4} from 'uuid';
+import IconButton from "@material-ui/core/IconButton";
+import DeleteIcon from "@material-ui/icons/Delete";
+import Tooltip from "@material-ui/core/Tooltip";
+import Styles from './Styles';
+import NewFoodFormModal from "./NewFoodFormModal";
 
 
 const AddRecipe = (props) => {
@@ -15,7 +20,13 @@ const AddRecipe = (props) => {
   const [recipeItems, setRecipeItems] = useState([]);
   const [foodItems, setFoodItems] = useState([]);
   const [foodOptions, setFoodOptions] = useState([]);
-
+  const [showNewFoodModal, setShowFoodModal] = useState(false);
+  const [foodModalDescription, setFoodModalDescription] = useState("");
+  const [foodModalRecipeItemId, setFoodModalRecipeItemId,] = useState(null);
+ 
+  
+  const classes = Styles.useStyles();
+  
   const onSubmit = data => {
     console.log(data);
     alert("post this data: " + JSON.stringify(data));
@@ -30,11 +41,8 @@ const AddRecipe = (props) => {
     //   }
     // );
   };
-
-  useEffect(() => {
-    
-    
-
+  
+  const fetchAllFoods = () => {
     FoodService.getAllFoods().then(
       (response) => {
         setFoodItems(response.data);
@@ -44,6 +52,10 @@ const AddRecipe = (props) => {
         alert(JSON.stringify(error));
       }
     );
+  };
+
+  useEffect(() => {
+    fetchAllFoods();
   }, []);
   
   const handleAddRow = event => {
@@ -57,7 +69,8 @@ const AddRecipe = (props) => {
       servings: 1,
       calories: 0,
       recipeItemId: uuidv4(),
-      foodItem: null
+      foodItem: null,
+      comment: ""
     });
     console.log(JSON.stringify(newRecipeItems));
     setRecipeItems(newRecipeItems);
@@ -93,6 +106,17 @@ const AddRecipe = (props) => {
         }
       }
       newRecipeItems.push(newItem);
+    });
+    setRecipeItems(newRecipeItems);
+  };
+
+  const deleteRecipeItemAction = (event, recipeItemId) => {
+    let newRecipeItems = [];
+    recipeItems.forEach(item => {
+      if (item.recipeItemId !== recipeItemId) {
+        let newItem = {...item};
+        newRecipeItems.push(newItem);
+      }
     });
     setRecipeItems(newRecipeItems);
   };
@@ -161,6 +185,54 @@ const AddRecipe = (props) => {
     handleRowServingsUpdate(recipeItemId, event.target.value);
   };
   
+  const handleCreateFoodItem = (value, recipeItemId) => {
+    console.log("Handle create item, recipeItemId = " + recipeItemId + 
+      ", value = " + value);
+    setFoodModalDescription(value);
+    setFoodModalRecipeItemId(recipeItemId);
+    setShowFoodModal(true);
+  };
+
+
+  
+  const handleCloseNewFoodModal = () => {
+    setShowFoodModal(false);
+  };
+  
+  const addFoodItem = newFoodItem => {
+    let newFoodItems = [];
+    foodItems.forEach(foodItem => {
+      newFoodItems.push(foodItem);
+    });
+    newFoodItems.push(newFoodItem);
+    setFoodItems(newFoodItems);
+    resetFoodOptions(foodItems);
+  };
+  
+  const handleSaveNewFood = (data) => {
+    
+    setShowFoodModal(false);
+    
+    let foodItem = {
+      description: data.description,
+      servingSize: data.servingSize,
+      calories: data.calories
+    };
+    FoodService.addFood(foodItem).then(
+      (response) => {
+        alert("Posted successfully, response is: " + JSON.stringify(response.data));
+        addFoodItem(data);
+        handleRowFoodItemSelected(data.recipeItemId, data);
+      },
+      (error) => {
+        console.log(JSON.stringify(error));
+        alert(JSON.stringify(error));
+      }
+    );
+  };
+
+  
+  
   return (
     <div className="container">
       <div>
@@ -196,9 +268,11 @@ const AddRecipe = (props) => {
           <thead>
       
             <tr>
-              <th style={{width: cellWidths.SERVINGS, border: "hidden"}}>Ingredients</th>
-              <th style={{width: cellWidths.DESCRIPTION, border: "hidden"}}></th>
-              <th style={{width: cellWidths.CALORIES, border: "hidden"}}>
+              <th style={{width: recipeCellWidths.SERVINGS, border: "hidden"}}>Ingredients</th>
+              <th style={{width: recipeCellWidths.DESCRIPTION, border: "hidden"}}></th>
+              <th style={{width: recipeCellWidths.COMMENT, border: "hidden"}}></th>
+              <th style={{width: recipeCellWidths.CALORIES, border: "hidden"}}></th>
+              <th style={{width: recipeCellWidths.DELETE, border: "hidden"}}>
                 <button style={{backgroundColor: '#00548F'}} className="btn btn-primary btn-block btn-secondary btn-sm"
                 onClick={event => handleAddRow(event)}>
                   Add
@@ -217,9 +291,11 @@ const AddRecipe = (props) => {
             <Table size="sm">
               <thead>
               <tr>
-                <th style={{width: cellWidths.SERVINGS}}>Servings</th>
-              <th style={{width: cellWidths.DESCRIPTION}}>Description</th>
-              <th style={{width: cellWidths.CALORIES}}>Calories</th>
+                <th style={{width: recipeCellWidths.SERVINGS}}>Servings</th>
+                <th style={{width: recipeCellWidths.DESCRIPTION}}>Description</th>
+                <th style={{width: recipeCellWidths.COMMENT}}>Comment</th>
+                <th style={{width: recipeCellWidths.CALORIES}}>Calories</th>
+                <th style={{width: recipeCellWidths.DELETE}}>Delete</th>
               </tr>
               </thead>
               <tbody>
@@ -232,16 +308,33 @@ const AddRecipe = (props) => {
                     onBlur={event => handleServingsOnBlur(event, row.recipeItemId)}/>
                   </td>
                   <td>
-                    <AsyncSelect cacheOptions defaultOptions loadOptions={promiseOptions}
-                                 key={row.recipeItemId}        
-                    onChange={event => {foodItemChanged(event, row.recipeItemId)}}/>
-                    
+                    <AsyncCreatableSelect 
+                      defaultOptions 
+                      loadOptions={promiseOptions}
+                      key={row.recipeItemId}        
+                      onChange={event => {foodItemChanged(event, row.recipeItemId)}}
+                      onCreateOption={value => handleCreateFoodItem(value, row.recipeItemId)}
+                    />
                   </td>
-                  
+                  <td>
+                    <textarea name={"comment-" + row.recipeItemId}  ref={register({required: true})} className="form-control"
+                           defaultValue={row.comment} rows="1"></textarea>
+                  </td>
                   <td style={{textAlign: "right"}}>
                     <span>{row.calories}</span>
                   </td>
-                    
+                  <td style={{textAlign: "right"}}>
+                    <Tooltip title="Delete entry">
+                      <IconButton
+                        aria-label="delete"
+                        className={classes.iconButton}
+                        id={row.id}
+                        onClick={event => deleteRecipeItemAction(event, row.recipeItemId)}
+                      >
+                        <DeleteIcon/>
+                      </IconButton>
+                    </Tooltip>
+                  </td>
                 </tr>)
               )) }
               </tbody>
@@ -257,6 +350,12 @@ const AddRecipe = (props) => {
         </div>
        
       </form>
+    <NewFoodFormModal show={showNewFoodModal} 
+                      handleClose={handleCloseNewFoodModal}
+                      handleSave={handleSaveNewFood}
+                      description={foodModalDescription}
+                      recipeItemId={foodModalRecipeItemId}
+    />
 
     </div>
   );
