@@ -28,26 +28,31 @@ const AddRecipe = (props) => {
     let newRecipeItems = [];
     
     for (let i = 0; i < recipeItems.length; i++) {
-      let item = recipeItems[i];
-      let newItem = JSON.parse(JSON.stringify(item));
+      let recipeItem = recipeItems[i];
+      let recipeItemCopy = JSON.parse(JSON.stringify(recipeItem));
      
       console.log("i: " + i + ", recipeItemId: " + recipeItemId);
-      console.log("newItem.recipeId: " + newItem.recipeItemId);
-      console.log("newItem: " + JSON.stringify(newItem));
-      if (newItem.recipeItemId === recipeItemId) {
+      console.log("recipeItemCopy.recipeId: " + recipeItemCopy.recipeItemId);
+      console.log("recipeItemCopy: " + JSON.stringify(recipeItemCopy));
+      if (recipeItemCopy.recipeItemId === recipeItemId) {
         console.log("Changing label and value to: " + JSON.stringify(newValue));
-        newItem.value = {
+        recipeItemCopy.value = {
           label: newValue.label,
           value: newValue.value
         };
-        newItem.foodItem = newFoodItem;
-        newItem.calories = newItem.foodItem.calories * newItem.servings;
-        newItem.servings = newFoodItem ? newFoodItem.servings: 0;
-        newItem.servingSize = newFoodItem ? newFoodItem.servingSize: "";
-        console.log("newItem: " + JSON.stringify(newItem));
+        if (newFoodItem) {
+          recipeItemCopy.foodItem = {...newFoodItem};
+        }
+        if (recipeItemCopy.foodItem) {
+          recipeItemCopy.calories = recipeItemCopy.foodItem.calories * recipeItemCopy.servings;
+        } else {
+          recipeItemCopy.calories = 0;
+        }
+        recipeItemCopy.servingSize = newFoodItem ? newFoodItem.servingSize: "";
+        console.log("newItem: " + JSON.stringify(recipeItemCopy));
         
       }
-      newRecipeItems.push(newItem);
+      newRecipeItems.push(recipeItemCopy);
     }
     
     setRecipeItems(newRecipeItems);
