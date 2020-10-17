@@ -72,15 +72,42 @@ const AddRecipe = (props) => {
     setIsLoading(true);
     console.group('Option created');
     console.log('Wait a moment...');
-    setTimeout(() => {
-      //const { options } = options;
-      const newOption = createOption(inputValue, recipeItemId);
-      console.log(newOption);
-      console.groupEnd();
-      setIsLoading(false);
-      setOptions([...options, newOption]);
-      setNewValue(newOption, recipeItemId);
-    }, 1000);
+    // setTimeout(() => {
+    //   const newOption = createOption(inputValue, recipeItemId);
+    //   console.log(newOption);
+    //   console.groupEnd();
+    //   setIsLoading(false);
+    //   setFoodOptions([...foodOptions, newOption]);
+    //   setNewValue(newOption, recipeItemId);
+    // }, 1000);
+    
+    let foodItem = {
+      description: inputValue,
+      servingSize: "1 Tablespoon",
+      calories: 20
+    };
+    FoodService.addFood(foodItem).then(
+      (response) => {
+        console.log("Posted successfully, response is: " + JSON.stringify(response.data));
+        //addFoodItem(response.data);
+        //fetchAllFoods();
+        //handleRowFoodItemSelected(data.recipeItemId, response.data);
+        
+        const newOption = createOption(inputValue, recipeItemId);
+        console.log(newOption);
+        setIsLoading(false);
+        setFoodOptions([...foodOptions, newOption]);
+        setNewValue(newOption, recipeItemId);
+        
+
+      },
+      (error) => {
+        console.log(JSON.stringify(error));
+        alert(JSON.stringify(error));
+        setIsLoading(false);
+      }
+    );
+
   };
   
   const classes = Styles.useStyles();
@@ -106,18 +133,18 @@ const AddRecipe = (props) => {
       (response) => {
         setFoodItems(response.data);
         resetFoodOptions(response.data);
-       
+        setIsLoading(false);
       },
       (error) => {
         alert(JSON.stringify(error));
-        setIsLoading(true);
+        setIsLoading(false);
       }
     );
   };
 
   useEffect(() => {
     fetchAllFoods();
-    setOptions(defaultOptions);
+    //setOptions(defaultOptions);
     
     
   }, []);
@@ -388,7 +415,7 @@ const AddRecipe = (props) => {
                       isLoading={isLoading}
                       onChange={(value, actionMetadata) => handleChange(value, actionMetadata, row.recipeItemId)}
                       onCreateOption={value => handleCreate(value, row.recipeItemId )}
-                      options={options}
+                      options={foodOptions}
                       value={values[index]}
                     />
                   </td>
