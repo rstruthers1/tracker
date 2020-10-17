@@ -37,26 +37,63 @@ const AddRecipe = (props) => {
   const [foodModalDescription, setFoodModalDescription] = useState("");
   const [foodModalRecipeItemId, setFoodModalRecipeItemId] = useState(null);
   const [options, setOptions] = useState([]);
-  const [values, setValues] = useState([]);
+  //const [values, setValues] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
 
-  const setNewValue = (newValue, recipeItemId) => {
+  const setNewValue = (newValue, recipeItemId, newFoodItem) => {
+    // console.group("setNewValue");
+    // let newValues = [];
+    // for (let i = 0; i < values.length; i++) {
+    //   let value = values[i];
+    //   let valueCopy =  {...value};
+    //   console.log("i: " + i + ", recipeItemId: " + recipeItemId);
+    //   console.log("valueCopy.recipeItemId: " + valueCopy.recipeItemId);
+    //   if (valueCopy.recipeItemId === recipeItemId) {
+    //     console.log("Changing label and value to: " + JSON.stringify(newValue));
+    //     valueCopy.label = newValue.label;
+    //     valueCopy.value = newValue.value;
+    //   }
+    //   newValues.push(valueCopy);
+    // }
+    // setValues(newValues);
+    // console.groupEnd();
     console.group("setNewValue");
-    let newValues = [];
-    for (let i = 0; i < values.length; i++) {
-      let value = values[i];
-      let valueCopy =  {...value};
-      console.log("i: " + i + ", recipeItemId: " + recipeItemId);
-      console.log("valueCopy.recipeItemId: " + valueCopy.recipeItemId);
-      if (valueCopy.recipeItemId === recipeItemId) {
+    let newRecipeItems = [];
+    // recipeItems.forEach(item => {
+    //   let newItem = JSON.parse(JSON.stringify(item));
+    //   newRecipeItems.push(newItem);
+    // });
+    
+    for (let i = 0; i < recipeItems.length; i++) {
+      let item = recipeItems[i];
+      let newItem = {...item};
+      let oldFoodItem = item.foodItem;
+      newItem.food = oldFoodItem ? {...oldFoodItem} : {};
+      let oldValue = item.value;
+      newItem.value = oldValue ? {...oldValue} : {};
+        console.log("i: " + i + ", recipeItemId: " + recipeItemId);
+        console.log("newItem.recipeId: " + newItem.recipeItemId);
+        console.log("newItem: " + JSON.stringify(newItem));
+      if (newItem.recipeItemId === recipeItemId) {
         console.log("Changing label and value to: " + JSON.stringify(newValue));
-        valueCopy.label = newValue.label;
-        valueCopy.value = newValue.value;
+        newItem.value = {
+          label: newValue.label,
+          value: newValue.value
+        };
+        newItem.foodItem = newFoodItem;
+        newItem.calories = newFoodItem.calories;
+        newItem.servings = newFoodItem.servings;
+        console.log("newItem: " + JSON.stringify(newItem));
+        
       }
-      newValues.push(valueCopy);
+      newRecipeItems.push(newItem);
     }
-    setValues(newValues);
+ 
+    // let newValues = [...values, {recipeItemId: newRecipeItemId}];
+    //setValues(newValues);
+   // console.log(JSON.stringify(newRecipeItems));
+    setRecipeItems(newRecipeItems);
     console.groupEnd();
   };
 
@@ -92,14 +129,16 @@ const AddRecipe = (props) => {
         //addFoodItem(response.data);
         //fetchAllFoods();
         //handleRowFoodItemSelected(data.recipeItemId, response.data);
-        
-        const newOption = createOption(inputValue, recipeItemId);
+        let item = response.data;
+        const newOption = { value: item.id,
+            label: item.servingSize + " - " + item.description,
+            color: '#00B8D9',
+            isFixed: true };
+        //createOption(inputValue, recipeItemId);
         console.log(newOption);
         setIsLoading(false);
         setFoodOptions([...foodOptions, newOption]);
-        setNewValue(newOption, recipeItemId);
-        
-
+        setNewValue(newOption, recipeItemId, item);
       },
       (error) => {
         console.log(JSON.stringify(error));
@@ -161,11 +200,10 @@ const AddRecipe = (props) => {
       servings: 1,
       calories: 0,
       recipeItemId: newRecipeItemId,
-      foodItem: {},
-      comment: ""
+      comment: "",
     });
-    let newValues = [...values, {recipeItemId: newRecipeItemId}];
-    setValues(newValues);
+   // let newValues = [...values, {recipeItemId: newRecipeItemId}];
+    //setValues(newValues);
     console.log(JSON.stringify(newRecipeItems));
     setRecipeItems(newRecipeItems);
   };
@@ -416,7 +454,7 @@ const AddRecipe = (props) => {
                       onChange={(value, actionMetadata) => handleChange(value, actionMetadata, row.recipeItemId)}
                       onCreateOption={value => handleCreate(value, row.recipeItemId )}
                       options={foodOptions}
-                      value={values[index]}
+                      value={row.value}
                     />
                   </td>
                   <td>
