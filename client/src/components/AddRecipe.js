@@ -34,8 +34,9 @@ const AddRecipe = (props) => {
   const [foodItems, setFoodItems] = useState([]);
   const [foodOptions, setFoodOptions] = useState([]);
   const [showNewFoodModal, setShowFoodModal] = useState(false);
-  const [foodModalDescription, setFoodModalDescription] = useState("");
-  const [foodModalRecipeItemId, setFoodModalRecipeItemId] = useState(null);
+  // const [foodModalDescription, setFoodModalDescription] = useState("");
+  // const [foodModalRecipeItemId, setFoodModalRecipeItemId] = useState(null);
+  const [foodModalData, setFoodModalData] = useState(null);
   const [options, setOptions] = useState([]);
   //const [values, setValues] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -82,8 +83,8 @@ const AddRecipe = (props) => {
           value: newValue.value
         };
         newItem.foodItem = newFoodItem;
-        newItem.calories = newFoodItem.calories;
-        newItem.servings = newFoodItem.servings;
+        newItem.calories = newFoodItem ? newFoodItem.calories: 0;
+        newItem.servings = newFoodItem ? newFoodItem.servings: 0;
         console.log("newItem: " + JSON.stringify(newItem));
         
       }
@@ -102,26 +103,63 @@ const AddRecipe = (props) => {
     console.log(newValue);
     console.log(`action: ${actionMeta.action}`);
     console.groupEnd();
-    setNewValue(newValue, recipeItemId);
+    setNewValue(newValue, recipeItemId, findFoodItem());
   };
   
   const handleCreate = (inputValue, recipeItemId) => {
     setIsLoading(true);
     console.group('Option created');
     console.log('Wait a moment...');
-    // setTimeout(() => {
-    //   const newOption = createOption(inputValue, recipeItemId);
-    //   console.log(newOption);
-    //   console.groupEnd();
-    //   setIsLoading(false);
-    //   setFoodOptions([...foodOptions, newOption]);
-    //   setNewValue(newOption, recipeItemId);
-    // }, 1000);
     
-    let foodItem = {
+    setFoodModalData({
       description: inputValue,
-      servingSize: "1 Tablespoon",
-      calories: 20
+      servingSize: "",
+      calories: 0,
+      recipeItemId: recipeItemId
+    });
+    setShowFoodModal(true);
+    
+    // let foodItem = {
+    //   description: inputValue,
+    //   servingSize: "1 Tablespoon",
+    //   calories: 20
+    // };
+    // FoodService.addFood(foodItem).then(
+    //   (response) => {
+    //     console.log("Posted successfully, response is: " + JSON.stringify(response.data));
+    //     //addFoodItem(response.data);
+    //     //fetchAllFoods();
+    //     //handleRowFoodItemSelected(data.recipeItemId, response.data);
+    //     let item = response.data;
+    //     const newOption = { value: item.id,
+    //         label: item.servingSize + " - " + item.description,
+    //         color: '#00B8D9',
+    //         isFixed: true };
+    //     //createOption(inputValue, recipeItemId);
+    //     console.log(newOption);
+    //     setIsLoading(false);
+    //     setFoodOptions([...foodOptions, newOption]);
+    //     setNewValue(newOption, recipeItemId, item);
+    //   },
+    //   (error) => {
+    //     console.log(JSON.stringify(error));
+    //     alert(JSON.stringify(error));
+    //     setIsLoading(false);
+    //   }
+    // );
+
+  };
+
+  const handleSaveNewFood = (data) => {
+
+    console.group("handleSaveNewFood");
+    console.log("data: " + JSON.stringify(data));
+    setShowFoodModal(false);
+
+    let foodItem = {
+      description: data.description,
+      servingSize: data.servingSize,
+      calories: data.calories
     };
     FoodService.addFood(foodItem).then(
       (response) => {
@@ -138,7 +176,7 @@ const AddRecipe = (props) => {
         console.log(newOption);
         setIsLoading(false);
         setFoodOptions([...foodOptions, newOption]);
-        setNewValue(newOption, recipeItemId, item);
+        setNewValue(newOption, data.recipeItemId, item);
       },
       (error) => {
         console.log(JSON.stringify(error));
@@ -147,6 +185,28 @@ const AddRecipe = (props) => {
       }
     );
 
+    // let foodItem = {
+    //   description: data.description,
+    //   servingSize: data.servingSize,
+    //   calories: data.calories
+    // };
+    // FoodService.addFood(foodItem).then(
+    //   (response) => {
+    //     // alert("Posted successfully, response is: " + JSON.stringify(response.data));
+    //     //addFoodItem(response.data);
+    //     fetchAllFoods();
+    //   
+    //     handleRowFoodItemSelected(data.recipeItemId, response.data);
+    //     setIsLoading(false);
+    //    
+    //   },
+    //   (error) => {
+    //     console.log(JSON.stringify(error));
+    //     alert(JSON.stringify(error));
+    //     setIsLoading(false);
+    //   }
+    // );
+    console.groupEnd();
   };
   
   const classes = Styles.useStyles();
@@ -322,8 +382,8 @@ const AddRecipe = (props) => {
     console.log("Handle create item, recipeItemId = " + recipeItemId + 
       ", value = " + value);
     setIsLoading(true);
-    setFoodModalDescription(value);
-    setFoodModalRecipeItemId(recipeItemId);
+    // setFoodModalDescription(value);
+    // setFoodModalRecipeItemId(recipeItemId);
     setShowFoodModal(true);
   };
 
@@ -344,32 +404,7 @@ const AddRecipe = (props) => {
     resetFoodOptions(foodItems);
   };
   
-  const handleSaveNewFood = (data) => {
-    
-    setShowFoodModal(false);
-    
-    let foodItem = {
-      description: data.description,
-      servingSize: data.servingSize,
-      calories: data.calories
-    };
-    FoodService.addFood(foodItem).then(
-      (response) => {
-        // alert("Posted successfully, response is: " + JSON.stringify(response.data));
-        //addFoodItem(response.data);
-        fetchAllFoods();
-       
-        handleRowFoodItemSelected(data.recipeItemId, response.data);
-        setIsLoading(false);
-        
-      },
-      (error) => {
-        console.log(JSON.stringify(error));
-        alert(JSON.stringify(error));
-        setIsLoading(false);
-      }
-    );
-  };
+
 
   
   
@@ -451,7 +486,7 @@ const AddRecipe = (props) => {
                     <CreatableSelect
                       isDisabled={isLoading}
                       isLoading={isLoading}
-                      onChange={(value, actionMetadata) => handleChange(value, actionMetadata, row.recipeItemId)}
+                      onChange={(value, actionMetadata) => handleChange(value, actionMetadata, row.recipeItemId, row.foodItem)}
                       onCreateOption={value => handleCreate(value, row.recipeItemId )}
                       options={foodOptions}
                       value={row.value}
@@ -494,8 +529,9 @@ const AddRecipe = (props) => {
     <NewFoodFormModal show={showNewFoodModal} 
                       handleClose={handleCloseNewFoodModal}
                       handleSave={handleSaveNewFood}
-                      description={foodModalDescription}
-                      recipeItemId={foodModalRecipeItemId}
+                      data={foodModalData}
+                      // description={foodModalDescription}
+                      // recipeItemId={foodModalRecipeItemId}
     />
 
     </div>
