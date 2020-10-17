@@ -129,7 +129,7 @@ const AddRecipe = (props) => {
       let newItem = JSON.parse(JSON.stringify(item));
       newRecipeItems.push(newItem);
     });
-    let newRecipeItemId =  uuidv4()
+    let newRecipeItemId =  uuidv4();
     newRecipeItems.push({
       servings: 1,
       calories: 0,
