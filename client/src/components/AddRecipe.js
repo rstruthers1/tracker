@@ -44,7 +44,7 @@ const AddRecipe = (props) => {
           value: newValue.value
         };
         newItem.foodItem = newFoodItem;
-        newItem.calories = newFoodItem ? newFoodItem.calories: 0;
+        newItem.calories = newItem.foodItem.calories * newItem.servings;
         newItem.servings = newFoodItem ? newFoodItem.servings: 0;
         newItem.servingSize = newFoodItem ? newFoodItem.servingSize: "";
         console.log("newItem: " + JSON.stringify(newItem));
@@ -63,12 +63,6 @@ const AddRecipe = (props) => {
     console.log(`action: ${actionMeta.action}`);
   
     console.groupEnd();
-    // let foodItem = {
-    //   description: description,
-    //   servingSize: servingSize,
-    //   calories: calories,
-    //   servings: servings
-    // };
     let foodItem = findFoodItem(newValue.value);
     let newFoodItem = {...foodItem};
     setNewValue(newValue, recipeItemId, newFoodItem);
@@ -170,7 +164,7 @@ const AddRecipe = (props) => {
   const handleRowServingsUpdate = (recipeItemId, servings) => {
     let newRecipeItems = [];
     recipeItems.forEach(item => {
-      let newItem = {...item};
+      let newItem = JSON.parse(JSON.stringify(item));
       if (recipeItemId === newItem.recipeItemId) {
         newItem.servings = servings;
         if (newItem.foodItem) {
@@ -247,7 +241,6 @@ const AddRecipe = (props) => {
     });
     newFoodItems.push(newFoodItem);
     setFoodItems(newFoodItems);
-    // resetFoodOptions(foodItems);
   };
   
   return (
