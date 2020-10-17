@@ -29,14 +29,11 @@ const AddRecipe = (props) => {
     
     for (let i = 0; i < recipeItems.length; i++) {
       let item = recipeItems[i];
-      let newItem = {...item};
-      let oldFoodItem = item.foodItem;
-      newItem.food = oldFoodItem ? {...oldFoodItem} : {};
-      let oldValue = item.value;
-      newItem.value = oldValue ? {...oldValue} : {};
-        console.log("i: " + i + ", recipeItemId: " + recipeItemId);
-        console.log("newItem.recipeId: " + newItem.recipeItemId);
-        console.log("newItem: " + JSON.stringify(newItem));
+      let newItem = JSON.parse(JSON.stringify(item));
+     
+      console.log("i: " + i + ", recipeItemId: " + recipeItemId);
+      console.log("newItem.recipeId: " + newItem.recipeItemId);
+      console.log("newItem: " + JSON.stringify(newItem));
       if (newItem.recipeItemId === recipeItemId) {
         console.log("Changing label and value to: " + JSON.stringify(newValue));
         newItem.value = {
