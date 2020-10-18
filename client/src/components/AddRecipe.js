@@ -108,6 +108,16 @@ const AddRecipe = (props) => {
   const onSubmit = data => {
     console.log(data);
     alert("post this data: " + JSON.stringify(data));
+    // RecipeService.addRecipe(data).then(
+    //   (response) => {
+    //     alert("Posted successfully, response is: " + JSON.stringify(response.data));
+    //     reset()
+    //   },
+    //   (error) => {
+    //     console.log(JSON.stringify(error));
+    //     alert(JSON.stringify(error));
+    //   }
+    // );
   };
   
   const fetchAllFoods = () => {
