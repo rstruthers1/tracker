@@ -1,9 +1,8 @@
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import React, {useState, useRef} from "react";
+import React from "react";
 import {useForm} from "react-hook-form";
 import _ from "lodash/fp";
-
 
 const NewFoodFormModal = (props) => {
   const { register, handleSubmit, reset, errors, control } = useForm();
@@ -15,14 +14,12 @@ const NewFoodFormModal = (props) => {
   let show = props.show;
   let handleClose = props.handleClose;
   let handleSave = props.handleSave;
- 
   
   const onSubmit = data => {
     console.log("onSubmit: " + data);
     handleSave(data);
   };
   
- 
   return (
   <Modal show={show} onHide={handleClose}>
     <Modal.Header closeButton>

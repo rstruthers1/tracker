@@ -14,6 +14,7 @@ import NewFoodFormModal from "./NewFoodFormModal";
 
 const AddRecipe = (props) => {
   const { register, handleSubmit, errors } = useForm();
+  const classes = Styles.useStyles();
   
   const [recipeItems, setRecipeItems] = useState([]);
   const [foodItems, setFoodItems] = useState([]);
@@ -31,9 +32,6 @@ const AddRecipe = (props) => {
       let recipeItem = recipeItems[i];
       let recipeItemCopy = JSON.parse(JSON.stringify(recipeItem));
      
-      console.log("i: " + i + ", recipeItemId: " + recipeItemId);
-      console.log("recipeItemCopy.recipeId: " + recipeItemCopy.recipeItemId);
-      console.log("recipeItemCopy: " + JSON.stringify(recipeItemCopy));
       if (recipeItemCopy.recipeItemId === recipeItemId) {
         console.log("Changing label and value to: " + JSON.stringify(selectedFoodOption));
         recipeItemCopy.value = {
@@ -42,13 +40,14 @@ const AddRecipe = (props) => {
         };
         if (selectedFood) {
           recipeItemCopy.foodItem = {...selectedFood};
-        }
-        if (recipeItemCopy.foodItem) {
+          console.log("recalculating calories");
+          console.log("recipeItemCopy.foodItem.calories: " + recipeItemCopy.foodItem.calories);
+          console.log("recipeItemCopy.serving: " + recipeItemCopy.servings);
           recipeItemCopy.calories = recipeItemCopy.foodItem.calories * recipeItemCopy.servings;
         } else {
           recipeItemCopy.calories = 0;
+          recipeItemCopy.foodItem = {}
         }
-        console.log("newItem: " + JSON.stringify(recipeItemCopy));
       }
       newRecipeItems.push(recipeItemCopy);
     }
@@ -58,11 +57,6 @@ const AddRecipe = (props) => {
   };
 
   const handleFoodChanged = (selectedFoodOption, actionMeta, recipeItemId) => {
-    console.group('Value Changed');
-    console.log(selectedFoodOption);
-    console.log(`action: ${actionMeta.action}`);
-  
-    console.groupEnd();
     // the selectedFoodOption.value is the food id
     let foodItem = findFoodItem(selectedFoodOption.value);
     let newFoodItem = {...foodItem};
@@ -71,9 +65,6 @@ const AddRecipe = (props) => {
   
   const handleCreateNewFoodItem = (partialDescriptionInputValue, recipeItemId) => {
     setIsLoading(true);
-    console.group('Option created');
-    console.log('Wait a moment...');
-    console.groupEnd();
     
     setFoodModalData({
       description: partialDescriptionInputValue,
@@ -85,8 +76,6 @@ const AddRecipe = (props) => {
   };
 
   const handleSaveNewFoodItem = (data) => {
-    console.group("handleSaveNewFoodItem");
-    console.log("data: " + JSON.stringify(data));
     setShowFoodModal(false);
 
     let foodItemRequestPayload = {
@@ -102,7 +91,6 @@ const AddRecipe = (props) => {
             label: newFoodItem.servingSize + " - " + newFoodItem.description,
             color: '#00B8D9',
             isFixed: true };
-        console.log(newFoodOption);
         setIsLoading(false);
         setFoodOptions([...foodOptions, newFoodOption]);
         addFoodItem(newFoodItem);
@@ -115,10 +103,7 @@ const AddRecipe = (props) => {
       }
     );
     
-    console.groupEnd();
   };
-  
-  const classes = Styles.useStyles();
   
   const onSubmit = data => {
     console.log(data);
@@ -158,7 +143,6 @@ const AddRecipe = (props) => {
       comment: "",
       foodItem: {}
     });
-    console.log(JSON.stringify(newRecipeItems));
     setRecipeItems(newRecipeItems);
   };
   
@@ -182,10 +166,10 @@ const AddRecipe = (props) => {
 
   const deleteRecipeItemAction = (event, recipeItemId) => {
     let newRecipeItems = [];
-    recipeItems.forEach(item => {
-      if (item.recipeItemId !== recipeItemId) {
-        let newItem = {...item};
-        newRecipeItems.push(newItem);
+    recipeItems.forEach(recipeItem => {
+      if (recipeItem.recipeItemId !== recipeItemId) {
+        let recipItemCopy = JSON.parse(JSON.stringify(recipeItem));
+        newRecipeItems.push(recipItemCopy);
       }
     });
     setRecipeItems(newRecipeItems);
@@ -193,14 +177,14 @@ const AddRecipe = (props) => {
   
   const resetFoodOptions = (foodItems) => {
     if (!foodItems) {
-      setFoodItems([]);
+      setFoodOptions([]);
       return;
     }
     let newFoodOptions = [];
-    foodItems.forEach(item => {
+    foodItems.forEach(foodItem => {
       newFoodOptions.push(
-        { value: item.id, 
-          label: item.servingSize + " - " + item.description, 
+        { value: foodItem.id, 
+          label: foodItem.servingSize + " - " + foodItem.description, 
           color: '#00B8D9', 
           isFixed: true },
       )
@@ -209,7 +193,6 @@ const AddRecipe = (props) => {
   };
   
   const findFoodItem = (foodId) => {
-    console.log("findFoodItem, foodId = " + foodId);
     for (let i = 0; i < foodItems.length; i++) {
       let foodItem = foodItems[i];
       if (foodId === foodItem.id) {
@@ -219,13 +202,7 @@ const AddRecipe = (props) => {
     return null;
   };
   
-
-  const handleServingsChanged = (event, recipeItemId) => {
-    console.log("handleServingsChanged: " + recipeItemId + ", value: " + event.target.value);
-  };
-  
   const handleServingsOnBlur = (event, recipeItemId) => {
-    console.log("handleServingsChanged: " + recipeItemId + ", value: " + event.target.value);
     handleRowServingsUpdate(recipeItemId, event.target.value);
   };
   
@@ -316,7 +293,6 @@ const AddRecipe = (props) => {
                   <td>
                     <input name={"servings-" + row.recipeItemId} type="number" step="0.001" min="0" ref={register({required: true})} className="form-control" 
                            defaultValue={row.servings}
-                    onChange={event => handleServingsChanged(event, row.recipeItemId)}
                     onBlur={event => handleServingsOnBlur(event, row.recipeItemId)}/>
                   </td>
                   <td>
