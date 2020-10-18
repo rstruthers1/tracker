@@ -27,7 +27,7 @@ const AddRecipe = (props) => {
 
     console.group("setFoodSelection");
     let newRecipeItems = [];
-    console.log("recipeItems.length = " + recipeItems.length);
+
     for (let i = 0; i < recipeItems.length; i++) {
       let recipeItem = recipeItems[i];
       let recipeItemCopy = JSON.parse(JSON.stringify(recipeItem));
