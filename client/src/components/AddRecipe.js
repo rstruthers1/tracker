@@ -1,19 +1,29 @@
 import React, {useState, useEffect} from "react";
-import { useForm} from "react-hook-form";
-import {recipeCellWidths} from "../utils/tracker.constants";
+
+import {useForm, Controller} from "react-hook-form";
+
 import Table from 'react-bootstrap/Table';
-import _ from "lodash/fp";
-import CreatableSelect from 'react-select/creatable';
-import FoodService from "../services/food.service";
-import {v4 as uuidv4} from 'uuid';
+
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import Tooltip from "@material-ui/core/Tooltip";
+
+import CreatableSelect from 'react-select/creatable';
+
+import _ from "lodash/fp";
+import {v4 as uuidv4} from 'uuid';
+
 import Styles from './Styles';
+
 import NewFoodFormModal from "./NewFoodFormModal";
 
+import {recipeCellWidths} from "../utils/tracker.constants";
+
+import FoodService from "../services/food.service";
+import RecipeService from "../services/recipe.service";
+
 const AddRecipe = (props) => {
-  const { register, handleSubmit, errors } = useForm();
+  const {register, handleSubmit, errors, reset, control} = useForm();
   const classes = Styles.useStyles();
   
   const [recipeItems, setRecipeItems] = useState([]);
@@ -22,6 +32,54 @@ const AddRecipe = (props) => {
   const [showNewFoodModal, setShowFoodModal] = useState(false);
   const [foodModalData, setFoodModalData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const onSubmit = data => {
+    console.log("data: " + JSON.stringify(data));
+    
+    if (recipeItems.length == 0) {
+      alert("You must add at least one ingredient");
+      return;
+    }
+    
+    let recipe = {
+      name: data.name,
+      servings: data.servings,
+      recipeItems: []
+    };
+    
+    for (let i = 0; i < recipeItems.length; i++) {
+      let recipeItem = recipeItems[i];
+      if (!recipeItem.foodItem || !recipeItem.foodItem.id) {
+        alert("Each ingredient must have a description selected");
+        return;
+      }
+      
+      if (recipeItem.servings <= 0) {
+        alert("Each of the ingredient servings must be greater than 0");
+        return;
+      }
+      
+      recipe.recipeItems.push({
+        foodItemId: recipeItem.foodItem.id,
+        servings: recipeItem.servings,
+        comments: data[`comment-${recipeItem.recipeItemId}`]
+      });
+    }
+    
+    console.log(JSON.stringify(recipe));
+    alert("post this data: " + JSON.stringify(recipe));
+    
+    RecipeService.addRecipe(recipe).then(
+      (response) => {
+        alert("Posted successfully, response is: " + JSON.stringify(response.data));
+        reset()
+      },
+      (error) => {
+        console.log(JSON.stringify(error));
+        alert(JSON.stringify(error));
+      }
+    );
+  };
   
   const setFoodSelection = (selectedFoodOption, recipeItemId, selectedFood) => {
 
@@ -103,21 +161,6 @@ const AddRecipe = (props) => {
       }
     );
     
-  };
-  
-  const onSubmit = data => {
-    console.log(data);
-    alert("post this data: " + JSON.stringify(data));
-    // RecipeService.addRecipe(data).then(
-    //   (response) => {
-    //     alert("Posted successfully, response is: " + JSON.stringify(response.data));
-    //     reset()
-    //   },
-    //   (error) => {
-    //     console.log(JSON.stringify(error));
-    //     alert(JSON.stringify(error));
-    //   }
-    // );
   };
   
   const fetchAllFoods = () => {
@@ -316,7 +359,7 @@ const AddRecipe = (props) => {
                     />
                   </td>
                   <td>
-                    <textarea name={"comment-" + row.recipeItemId}  ref={register({required: true})} className="form-control"
+                    <textarea name={"comment-" + row.recipeItemId}  ref={register({required: false})} className="form-control"
                            defaultValue={row.comment} rows="1"></textarea>
                   </td>
                   <td style={{textAlign: "right"}}>
