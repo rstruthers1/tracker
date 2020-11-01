@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useCallback, useState, useEffect} from "react";
 
 import {useForm, Controller} from "react-hook-form";
 
@@ -9,6 +9,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import Tooltip from "@material-ui/core/Tooltip";
 
 import CreatableSelect from 'react-select/creatable';
+import AsyncCreatableSelect from 'react-select/async-creatable';
 
 import _ from "lodash/fp";
 import {v4 as uuidv4} from 'uuid';
@@ -32,6 +33,50 @@ const AddRecipe = (props) => {
   const [showNewFoodModal, setShowFoodModal] = useState(false);
   const [foodModalData, setFoodModalData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  
+
+  const resetFoodOptions = (foodItems) => {
+    if (!foodItems) {
+      setFoodOptions([]);
+      return;
+    }
+    let newFoodOptions = [];
+    foodItems.forEach(foodItem => {
+      newFoodOptions.push(
+        { value: foodItem.id,
+          label: foodItem.servingSize + " - " + foodItem.description,
+          color: '#00B8D9',
+          isFixed: true },
+      )
+    });
+    setFoodOptions(newFoodOptions);
+  };
+  
+  const mapOptionsToValues = options => {
+    return options.map(foodItem=> ({
+      value: foodItem.id,
+      label: foodItem.servingSize + " - " + foodItem.description
+    }));
+  };
+
+  const promiseOptions = (inputValue, callback) => {
+    if (!inputValue) {
+      return callback([]);
+    }
+
+    FoodService.getFilteredFoods(inputValue).then(
+      (response) => {
+        setFoodItems(response.data);
+        //resetFoodOptions(response.data);
+        callback(mapOptionsToValues(response.data));
+        setIsLoading(false);
+      },
+      (error) => {
+        alert(JSON.stringify(error));
+        setIsLoading(false);
+      }
+    );
+  };
 
   const onSubmit = data => {
     console.log("data: " + JSON.stringify(data));
@@ -228,22 +273,7 @@ const AddRecipe = (props) => {
     setRecipeItems(newRecipeItems);
   };
   
-  const resetFoodOptions = (foodItems) => {
-    if (!foodItems) {
-      setFoodOptions([]);
-      return;
-    }
-    let newFoodOptions = [];
-    foodItems.forEach(foodItem => {
-      newFoodOptions.push(
-        { value: foodItem.id, 
-          label: foodItem.servingSize + " - " + foodItem.description, 
-          color: '#00B8D9', 
-          isFixed: true },
-      )
-    });
-    setFoodOptions(newFoodOptions);
-  };
+
   
   const findFoodItem = (foodId) => {
     for (let i = 0; i < foodItems.length; i++) {
@@ -274,6 +304,21 @@ const AddRecipe = (props) => {
     newFoodItems.push(newFoodItem);
     setFoodItems(newFoodItems);
   };
+  
+  const asyncSelect = (row) => {
+    return       <AsyncCreatableSelect
+      isDisabled={isLoading}
+      isLoading={isLoading}
+      onChange={(value, actionMetadata) => handleFoodChanged(value, actionMetadata, row.recipeItemId)}
+      onCreateOption={value => handleCreateNewFoodItem(value, row.recipeItemId )}
+      options={foodOptions}
+      value={row.value}
+      defaultOptions
+      loadOptions={promiseOptions}
+    />
+  };
+
+
   
   return (
     <div className="container">

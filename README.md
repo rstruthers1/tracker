@@ -28,6 +28,13 @@ https://rms-tracker.herokuapp.com/
 ### Deploying react app with node backend to Heroku
 * https://dev.to/nburgess/creating-a-react-app-with-react-router-and-an-express-backend-33l3
 
+### react-select
+* https://stackoverflow.com/questions/52984105/react-select-async-loadoptions-is-not-loading-options-properly
+* https://react-select.com/creatable
+
+### debounce
+* https://levelup.gitconnected.com/how-to-debounce-props-with-react-hooks-20db02af53be
+
 ### Others
 * https://flaviocopes.com/express-send-response/
 * https://github.com/validatorjs/validator.js

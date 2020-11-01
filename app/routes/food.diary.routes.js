@@ -21,13 +21,18 @@ module.exports = function(app) {
     [authJwt.verifyToken],
     controller.foodSubmitted
   );
-
-
+  
 
   app.get("/api/food",
     [authJwt.verifyToken],
     controller.getAllFoods
+  );
+
+  app.get("/api/food/filter/:filterValue",
+    [authJwt.verifyToken],
+    controller.getFoodsFiltered
   )
+  
 
   app.post(
     "/api/food/diary",

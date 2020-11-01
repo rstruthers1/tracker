@@ -12,6 +12,10 @@ const getAllFoods = () => {
   return axios.get(API_URL , { headers: authHeader() });
 };
 
+const getFilteredFoods = (filter) => {
+  return axios.get(`${API_URL}/filter/${filter}` , { headers: authHeader() });
+};
+
 const addFoodsToDiary = (data) => {
   return axios.post("/api/food/diary", data, { headers: authHeader() })
 };
@@ -35,5 +39,6 @@ export default {
   addFoodsToDiary,
   getFoodDiary,
   deleteFoodItemFromDiary,
-  updateFoodDiaryItem
+  updateFoodDiaryItem,
+  getFilteredFoods
 };

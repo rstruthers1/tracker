@@ -1,10 +1,9 @@
 const db = require("../models");
 const Food = db.food;
 const FoodDiaryItem = db.foodDiaryItem;
-const { QueryTypes } = require('sequelize');
+const { QueryTypes, Op } = require('sequelize');
 const Utils = require('../utils/utils');
 
-const Op = db.Sequelize.Op;
 
 exports.foodDiary = (req, res) => {
   console.log("food.diary.controller");
@@ -76,6 +75,24 @@ exports.foodSubmitted = (req, res) => {
 
 exports.getAllFoods = (req, res) => {
   Food.findAll({
+
+    order: [['description', 'ASC']]
+  }).then(foods => {
+    res.status(200).send(foods);
+  }).catch(err => {
+    res.status(500).send("error getting all the foods")
+  });
+};
+
+exports.getFoodsFiltered = (req, res) => {
+  console.log("****PARAMS: " + JSON.stringify(req.params));
+  const filterValue = req.params.filterValue;
+  Food.findAll({
+    where: {
+      description: {
+        [Op.like]: `%${filterValue}%`
+      }
+    },
     order: [['description', 'ASC']]
   }).then(foods => {
     res.status(200).send(foods);
