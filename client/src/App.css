@@ -77,4 +77,54 @@ label {
   font-weight: bold;
 }
 
+/* Animations */
+.fadein {
+  animation: fadein 2s;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.delete {
+  position: relative;
+  top: 16px;
+  right: 15px
+}
+
+footer svg, .button svg, .delete svg {
+  filter: drop-shadow(3px 3px 3px #999);
+  transition: 0.3s;
+  transform: rotate(-0.2deg)
+}
+
+footer svg:hover, .button svg:hover, .delete svg:hover {
+  filter: drop-shadow(4px 4px 4px #999);
+  transform: rotate(-0.6deg);
+  cursor: pointer
+}
+
+.delete svg {
+  filter: drop-shadow(1px 1px 1px #999)
+}
+
+footer svg {
+  filter: drop-shadow(1.5px 1px 1px #999)
+}
+
+footer svg:hover, .delete svg:hover {
+  filter: drop-shadow(1.5px 1.5px 1.5px)
+}
+
+.recipeImg {
+  max-height: 420px;
+  max-width: 420px;
+  padding: 10px;
+  border: 1px dashed #999;
+}
 

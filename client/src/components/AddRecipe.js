@@ -23,6 +23,8 @@ import {recipeCellWidths} from "../utils/tracker.constants";
 import FoodService from "../services/food.service";
 import RecipeService from "../services/recipe.service";
 
+import Images from './Images'
+
 const AddRecipe = (props) => {
   const {register, handleSubmit, errors, reset, control} = useForm();
   const classes = Styles.useStyles();
@@ -33,6 +35,7 @@ const AddRecipe = (props) => {
   const [showNewFoodModal, setShowFoodModal] = useState(false);
   const [foodModalData, setFoodModalData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [picture, setPicture] = useState(null);
   
 
   const resetFoodOptions = (foodItems) => {
@@ -318,13 +321,56 @@ const AddRecipe = (props) => {
     />
   };
 
-
+  const onImageFileChange = e => {
+    let file= e.target.files[0];
+    let imageType = /image.*/;
+    if (!file.type.match(imageType)) {
+      alert("Wrong file type for image!");
+      return;
+    }
+    let reader = new FileReader();
+    reader.onload = function(event) {
+      setPicture(event.target.result);
+      console.log(event.target.result);
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  const removeImage = () => {
+    setPicture(null);
+  };
+  
+  const onError = () => {
+    
+  };
   
   return (
     <div className="container">
       <div>
         Add Recipe
       </div>
+
+      
+      <div className="form-group">
+        <label className="control-label col-sm-6" htmlFor="name">Recipe Image</label>
+        <div className="col-sm-6">
+          { picture ? (
+            <Images
+              images={[picture]}
+              removeImage={removeImage}
+              onError={onError}
+            />
+          ) : (
+            <div>
+              <input type='file' id='single' onChange={event => onImageFileChange(event)} />
+            </div>
+          )
+          }
+        </div>
+      </div>
+      
+      
+      
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="form-group">
           <label className="control-label col-sm-6" htmlFor="name">Recipe Name</label>
@@ -348,6 +394,9 @@ const AddRecipe = (props) => {
             )}
           </div>
         </div>
+
+       
+        
 
         <div className="form-group">
           <div className="col-sm-10">
