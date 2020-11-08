@@ -96,6 +96,7 @@ const AddRecipe = (props) => {
     let recipe = {
       name: data.name,
       servings: data.servings,
+      imageId: picture ? picture.id : null,
       recipeItems: []
     };
     

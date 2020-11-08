@@ -12,6 +12,7 @@ exports.addRecipe = (req, res) => {
     {
       name: req.body.name,
       servings: req.body.servings,
+      imageId: req.body.imageId,
       userId: req.userId,
     }
   ).then(recipe => {
