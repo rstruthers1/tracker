@@ -99,8 +99,9 @@ const Register = (props) => {
       );
     }
   };
-
-  return (
+  
+  const sigunup = () => {
+    return (
     <div className="col-md-12">
       <div className="card card-container">
         <img
@@ -168,6 +169,11 @@ const Register = (props) => {
         </Form>
       </div>
     </div>
+    );
+  }
+
+  return (
+    <h1>Sorry, sign up isn't currently available.</h1>
   );
 };
 
