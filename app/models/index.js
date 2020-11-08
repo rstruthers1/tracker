@@ -30,6 +30,7 @@ db.food = require("../models/food.model")(sequelize, Sequelize);
 db.foodDiaryItem = require("../models/foodDiaryItem.model")(sequelize, Sequelize);
 db.recipe = require("../models/recipe.model")(sequelize, Sequelize);
 db.recipeItem = require("../models/recipeItem.model")(sequelize, Sequelize);
+db.image = require("../models/image.model")(sequelize, Sequelize);
 
 db.role.belongsToMany(db.user, {
   through: "user_roles",

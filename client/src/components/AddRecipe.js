@@ -3,6 +3,7 @@ import React, {useCallback, useState, useEffect} from "react";
 import {useForm, Controller} from "react-hook-form";
 
 import Table from 'react-bootstrap/Table';
+import Spinner from 'react-bootstrap/Spinner'
 
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -22,8 +23,9 @@ import {recipeCellWidths} from "../utils/tracker.constants";
 
 import FoodService from "../services/food.service";
 import RecipeService from "../services/recipe.service";
+import ImageService from "../services/image.service";
 
-import Images from './Images'
+import Image from './Image'
 
 const AddRecipe = (props) => {
   const {register, handleSubmit, errors, reset, control} = useForm();
@@ -36,6 +38,7 @@ const AddRecipe = (props) => {
   const [foodModalData, setFoodModalData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [picture, setPicture] = useState(null);
+  const [isPictureLoading, setIsPictureLoading] = useState(false);
   
 
   const resetFoodOptions = (foodItems) => {
@@ -83,6 +86,7 @@ const AddRecipe = (props) => {
 
   const onSubmit = data => {
     console.log("data: " + JSON.stringify(data));
+    console.log("picture: " + picture);
     
     if (recipeItems.length == 0) {
       alert("You must add at least one ingredient");
@@ -328,12 +332,25 @@ const AddRecipe = (props) => {
       alert("Wrong file type for image!");
       return;
     }
-    let reader = new FileReader();
-    reader.onload = function(event) {
-      setPicture(event.target.result);
-      console.log(event.target.result);
-    };
-    reader.readAsDataURL(file);
+    // let reader = new FileReader();
+    // reader.onload = function(event) {
+    //   setPicture(event.target.result);
+    //   console.log(event.target.result);
+    // };
+    // reader.readAsDataURL(file);
+    setIsPictureLoading(true);
+    ImageService.uploadImage(file).then(
+      (response) => {
+        console.log("Uploaded image successfully: " + JSON.stringify(response));
+        setIsPictureLoading(false);
+        setPicture(response.data);
+      },
+      (error) => {
+        console.log("Error uploading image: " + JSON.stringify(error));
+        alert("Error uploading image: " + JSON.stringify(error));
+        setIsPictureLoading(false);
+      }
+    );
   };
   
   const removeImage = () => {
@@ -354,9 +371,11 @@ const AddRecipe = (props) => {
       <div className="form-group">
         <label className="control-label col-sm-6" htmlFor="name">Recipe Image</label>
         <div className="col-sm-6">
-          { picture ? (
-            <Images
-              images={[picture]}
+          { isPictureLoading ? (<span><Spinner animation="border" role="status">
+            <span className="sr-only">Loading...</span>
+          </Spinner><div className="sr-only">Loading...</div></span>): (picture ? (
+            <Image
+              image={picture}
               removeImage={removeImage}
               onError={onError}
             />
@@ -364,7 +383,7 @@ const AddRecipe = (props) => {
             <div>
               <input type='file' id='single' onChange={event => onImageFileChange(event)} />
             </div>
-          )
+          ))
           }
         </div>
       </div>

@@ -1,8 +1,10 @@
 const express = require('express');
+const formData = require('express-form-data')
 const bodyParser = require("body-parser");
 const path = require('path');
 require('dotenv').config();
 const cors = require("cors");
+const { CLIENT_ORIGIN } = require('./config')
 
 const db = require("./app/models");
 // const Role = db.role;
@@ -30,11 +32,12 @@ db.sequelize.sync().then(() => {
 // }
 
 const app = express();
-var corsOptions = {
-  origin: "http://localhost:8081"
-};
+app.use(cors({
+  origin: CLIENT_ORIGIN
+}));
 
-app.use(cors(corsOptions));
+
+app.use(formData.parse())
 
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
@@ -47,11 +50,12 @@ require('./app/routes/auth.routes')(app);
 require('./app/routes/user.routes')(app);
 require('./app/routes/food.diary.routes')(app);
 require('./app/routes/recipe.routes')(app);
+require('./app/routes/image.routes')(app);
 
 
 // simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to bezkoder application." });
+  res.json({ message: "Welcome to rms-tracker service." });
 });
 
 
