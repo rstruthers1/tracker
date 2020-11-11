@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Switch, Route, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
@@ -13,23 +13,68 @@ import FoodDiary from "./components/FoodDiary";
 import AddNewFood from "./components/AddNewFood";
 import AddFoodToDiary from "./components/AddFoodToDiary"
 import AddRecipe from "./components/AddRecipe";
+import Recipes from "./components/Recipes";
+import WakeUp from './components/WakeUp';
+import WakeUpService from './services/wakeup.service';
+import useInterval from './hooks/useInterval';
+
 
 
 const App = () => {
   const [currentUser, setCurrentUser] = useState(undefined);
+  const [wakingUp, setWakingUp] = useState(true);
+  const [seconds, setSeconds] = useState(5);
+  const [isActive, setIsActive] = useState(true);
+
+  function toggle() {
+    setIsActive(!isActive);
+  }
+
+  function reset() {
+    setSeconds(0);
+    setIsActive(false);
+  }
+  
+  const wakeupPoll = () => {
+    console.log("Calling wakeup");
+    WakeUpService.isServerAwake().then(
+      (response) => {
+
+        setWakingUp(false);
+        setIsActive(false);
+      },
+      (error) => {
+
+      }
+    );
+  };
+  
+  
 
   useEffect(() => {
+    
     const user = AuthService.getCurrentUser();
     if (user) {
       setCurrentUser(user);
     }
-  }, []);
+
+    let interval = null;
+    if (isActive) {
+      wakeupPoll();
+      interval = setInterval(() => {
+        setSeconds(seconds => seconds + 1);
+      }, 1000);
+    } else if (!isActive && seconds !== 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isActive, seconds]);
 
   const logOut = () => {
     AuthService.logout();
   };
 
-  return (
+  return (wakingUp ? (<WakeUp/>) :(
     <div>
       <nav className="navbar navbar-expand navbar-dark bg-dark">
         <Link to={"/"} className="navbar-brand">
@@ -59,6 +104,13 @@ const App = () => {
             <li className="nav-item">
               <Link to={"/addRecipe"} className="nav-link">
                 Add Recipe
+              </Link>
+            </li>
+          )}
+          {currentUser && (
+            <li className="nav-item">
+              <Link to={"/recipes"} className="nav-link">
+                Recipes
               </Link>
             </li>
           )}
@@ -104,10 +156,11 @@ const App = () => {
           <Route path="/addNewFood" component={AddNewFood} />
           <Route path="/addFoodToDiary" component={AddFoodToDiary}/>
           <Route path="/addRecipe" component={AddRecipe}/>
+          <Route path="/recipes" component={Recipes}/>
         </Switch>
       </div>
     </div>
-  );
+  ));
 };
 
 export default App;

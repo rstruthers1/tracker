@@ -1,5 +1,5 @@
 const db = require("../models");
-const cloudinary = require('cloudinary')
+const cloudinary = require('cloudinary');
 const Image = db.image;
 const { QueryTypes } = require('sequelize');
 const { v4: uuidv4 } = require('uuid'); 

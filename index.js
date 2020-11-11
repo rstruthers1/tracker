@@ -46,11 +46,13 @@ app.use(bodyParser.json());
 // parse requests of content-type: application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 // routes
+
 require('./app/routes/auth.routes')(app);
 require('./app/routes/user.routes')(app);
 require('./app/routes/food.diary.routes')(app);
 require('./app/routes/recipe.routes')(app);
 require('./app/routes/image.routes')(app);
+require('./app/routes/wakeup.routes')(app);
 
 
 // simple route
