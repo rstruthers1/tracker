@@ -13,7 +13,8 @@ cloudinary.config({
 const Op = db.Sequelize.Op;
 
 
-
+// Upload the image to Cloudinary.
+// Store the url for the image returned from Cloudinary in the images table.
 exports.uploadImage = (req, res) => {
   console.log("uploadImage");
   const imageFiles = Object.values(req.files);

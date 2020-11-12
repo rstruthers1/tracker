@@ -15,4 +15,12 @@ module.exports = function(app) {
     [authJwt.verifyToken],
     controller.addRecipe
   );
+
+  app.get(
+    "/api/recipe",
+    [authJwt.verifyToken],
+    controller.getRecipes
+  );
 };
+
+

@@ -7,6 +7,11 @@ const addRecipe = (data) => {
   return axios.post(API_URL , data, { headers: authHeader() });
 };
 
+const getRecipes = () => {
+  return axios.get(API_URL , { headers: authHeader() });
+};
+
 export default {
-  addRecipe
+  addRecipe,
+  getRecipes
 };

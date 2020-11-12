@@ -31,7 +31,7 @@ module.exports = function(app) {
   app.get("/api/food/filter/:filterValue",
     [authJwt.verifyToken],
     controller.getFoodsFiltered
-  )
+  );
   
 
   app.post(
