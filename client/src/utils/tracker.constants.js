@@ -8,7 +8,8 @@ export const mealTypes = {
 export const cellWidths = {
   DESCRIPTION: '400px',
   CALORIES: '100px',
-  SERVINGS: '100px'
+  SERVINGS: '100px',
+  SERVING_SIZE: '100px'
 };
 
 export const recipeCellWidths = {

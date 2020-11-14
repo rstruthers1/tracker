@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import FoodService from "../services/food.service";
+import {cellWidths} from "../utils/tracker.constants";
 
 
 const Foods = (props) => {
@@ -23,16 +24,22 @@ const Foods = (props) => {
       <h1>Foods</h1>
       {
         foods ? (
-            <div>
+            <table>
+              <thead>
+              <tr><th>Description</th><th>Serving Size</th><th>Calories</th></tr>
+              </thead>
+              <tbody>
               {
                 foods.map((row) => (
-                  <div key={row.id}>
-                    <h2>{row.description}</h2>
-                    
-                  </div>
+                  <tr key={row.id}>
+                    <td style={{width: cellWidths.DESCRIPTION}}>{row.description}</td>
+                    <td style={{width: cellWidths.SERVING_SIZE}}>{row.servingSize}</td>
+                    <td e={{width: cellWidths.CALORIES}}>{row.calories}</td>
+                  </tr>
                 ))
               }
-            </div>
+              </tbody>
+            </table>
           ) :
           (
             <div>No foods</div>
