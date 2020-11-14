@@ -17,6 +17,7 @@ import Recipes from "./components/Recipes";
 import WakeUp from './components/WakeUp';
 import WakeUpService from './services/wakeup.service';
 import AddMeasurementUnit from "./components/AddMeaurementUnit";
+import Foods from "./components/Foods";
 
 
 
@@ -102,6 +103,13 @@ const App = () => {
           )}
           {currentUser && (
             <li className="nav-item">
+              <Link to={"/foods"} className="nav-link">
+                Foods
+              </Link>
+            </li>
+          )}
+          {currentUser && (
+            <li className="nav-item">
               <Link to={"/addRecipe"} className="nav-link">
                 Add Recipe
               </Link>
@@ -165,6 +173,7 @@ const App = () => {
           <Route path="/addRecipe" component={AddRecipe}/>
           <Route path="/recipes" component={Recipes}/>
           <Route path="/addMeasurementUnit" component={AddMeasurementUnit}/>
+          <Route path="/foods" component={Foods}/>
         </Switch>
       </div>
     </div>
