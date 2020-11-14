@@ -16,7 +16,7 @@ import AddRecipe from "./components/AddRecipe";
 import Recipes from "./components/Recipes";
 import WakeUp from './components/WakeUp';
 import WakeUpService from './services/wakeup.service';
-import useInterval from './hooks/useInterval';
+import AddMeasurementUnit from "./components/AddMeaurementUnit";
 
 
 
@@ -114,6 +114,13 @@ const App = () => {
               </Link>
             </li>
           )}
+          {currentUser && (
+            <li className="nav-item">
+              <Link to={"/addMeasurementUnit"} className="nav-link">
+                New Measurement Unit
+              </Link>
+            </li>
+          )}
         </div>
         {currentUser ? (
           <div className="navbar-nav ml-auto">
@@ -157,6 +164,7 @@ const App = () => {
           <Route path="/addFoodToDiary" component={AddFoodToDiary}/>
           <Route path="/addRecipe" component={AddRecipe}/>
           <Route path="/recipes" component={Recipes}/>
+          <Route path="/addMeasurementUnit" component={AddMeasurementUnit}/>
         </Switch>
       </div>
     </div>
