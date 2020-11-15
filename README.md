@@ -40,6 +40,9 @@ https://rms-tracker.herokuapp.com/
 ### react-bootstrap table
 * https://react-bootstrap.github.io/components/table/
 
+### react-material-ui
+* Custom page navigation: https://codesandbox.io/s/hier2?file=/demo.js:3830-3951
+
 ### Images
 https://codeburst.io/react-image-upload-with-kittens-cc96430eaece
 

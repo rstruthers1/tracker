@@ -1,7 +1,20 @@
 import React, {useEffect, useState} from "react";
 import {useTable, usePagination, useFilters} from 'react-table';
-import Table from 'react-bootstrap/Table'
-import Button from 'react-bootstrap/Button'
+
+import Paper from "@material-ui/core/Paper";
+import TableContainer from '@material-ui/core/TableContainer';
+import Table from "@material-ui/core/Table";
+import TableBody from '@material-ui/core/TableBody';
+import TableHead from '@material-ui/core/TableHead';
+import TablePagination from '@material-ui/core/TablePagination';
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
+import IconButton from '@material-ui/core/IconButton';
+import FirstPageIcon from '@material-ui/icons/FirstPage';
+import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import LastPageIcon from '@material-ui/icons/LastPage';
+import {makeStyles, useTheme} from "@material-ui/core/styles";
 
 import FoodService from "../services/food.service";
 
@@ -93,98 +106,122 @@ const Foods = (props) => {
   const FoodsTable = () => {
     /**** Initialize react-table ****/
     const {
-      getTableProps,
       getTableBodyProps,
       headerGroups,
       rows,
       prepareRow,
-      page, // Instead of using 'rows', we'll use page,
-      // which has only the rows for the active page
-
-      // The rest of these things are super handy, too ;)
-      canPreviousPage,
-      canNextPage,
-      pageOptions,
-      pageCount,
+      page, 
       gotoPage,
-      nextPage,
-      previousPage,
       setPageSize,
       state: {pageIndex, pageSize}
     } = useTable({columns, data, defaultColumn, initialState: {pageIndex: 0},}, useFilters, usePagination);
 
+    const handleChangePage = (event, newPage) => {
+      gotoPage(newPage);
+    };
+    
+    const handleChangeRowsPerPage = (event) => {
+      setPageSize(parseInt(event.target.value, 10));
+    };
+
+    const useStyles1 = makeStyles((theme) => ({
+      root: {
+        flexShrink: 0,
+        marginLeft: theme.spacing(2.5),
+      },
+    }));
+
+    function TablePaginationActions(props) {
+      const classes = useStyles1();
+      const theme = useTheme();
+      const { count, page, rowsPerPage, onChangePage } = props;
+
+      const handleFirstPageButtonClick = (event) => {
+        onChangePage(event, 0);
+      };
+
+      const handleBackButtonClick = (event) => {
+        onChangePage(event, page - 1);
+      };
+
+      const handleNextButtonClick = (event) => {
+        onChangePage(event, page + 1);
+      };
+
+      const handleLastPageButtonClick = (event) => {
+        onChangePage(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+      };
+
+      return (
+        <div className={classes.root}>
+          <IconButton
+            onClick={handleFirstPageButtonClick}
+            disabled={page === 0}
+            aria-label="first page"
+          >
+            {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
+          </IconButton>
+          <IconButton onClick={handleBackButtonClick} disabled={page === 0} aria-label="previous page">
+            {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+          </IconButton>
+          <IconButton
+            onClick={handleNextButtonClick}
+            disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+            aria-label="next page"
+          >
+            {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+          </IconButton>
+          <IconButton
+            onClick={handleLastPageButtonClick}
+            disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+            aria-label="last page"
+          >
+            {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
+          </IconButton>
+        </div>
+      );
+    }
+
     return (
-      <div>
-        <Table {...getTableProps()}>
-          <thead>
+      <Paper>
+        <TableContainer>
+          <Table size='medium'>
+          <TableHead>
           {headerGroups.map(headerGroup => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
+            <TableRow {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map(column => (
-                <th {...column.getHeaderProps()}>{column.render('Header')}
+                <TableCell {...column.getHeaderProps()}>{column.render('Header')}
                   <span style={{paddingLeft: "10px"}}>{column.canFilter ? column.render('Filter') : null}</span>
-                </th>
+                </TableCell>
               ))}
-            </tr>
+            </TableRow>
           ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
+          </TableHead>
+          <TableBody {...getTableBodyProps()}>
           {page.map((row, i) => {
             prepareRow(row);
             return (
-              <tr {...row.getRowProps()}>
+              <TableRow {...row.getRowProps()}>
                 {row.cells.map(cell => {
-                  return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                  return <TableCell {...cell.getCellProps()}>{cell.render('Cell')}</TableCell>
                 })}
-              </tr>
+              </TableRow>
             )
           })}
-          </tbody>
+          </TableBody>
         </Table>
-        <span style={{marginRight: "10px"}}>
-          <Button onClick={() => gotoPage(0)} disabled={!canPreviousPage} style={{marginRight: "5px"}}>
-            {'<<'}
-          </Button>
-          <Button onClick={() => previousPage()} disabled={!canPreviousPage} style={{marginRight: "5px"}}>
-            {'<'}
-          </Button>
-          <Button onClick={() => nextPage()} disabled={!canNextPage} style={{marginRight: "5px"}}>
-            {'>'}
-          </Button>
-          <Button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} style={{marginRight: "5px"}}>
-            {'>>'}
-          </Button>
-        </span>
-        <span style={{marginRight: "10px"}}>
-          Page{' '}
-          <strong>
-            {pageIndex + 1} of {pageOptions.length}
-          </strong>{' '}
-        </span>
-        <span style={{marginRight: "20px"}}>
-          Go to page:{' '}
-          <input
-            type="number"
-            defaultValue={pageIndex + 1}
-            onChange={e => {
-              const page = e.target.value ? Number(e.target.value) - 1 : 0
-              gotoPage(page)
-            }}
-            style={{width: '100px'}}
-          />
-        </span>
-        <select
-          value={pageSize}
-          onChange={e => {
-            setPageSize(Number(e.target.value))
-          }}
-        >
-          {[10, 20, 30, 40, 50].map(pageSize => (
-            <option key={pageSize} value={pageSize}>
-              Show {pageSize}
-            </option>
-          ))}
-        </select>
-      </div>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={rows.length}
+          rowsPerPage={pageSize}
+          page={pageIndex}
+          onChangeRowsPerPage={handleChangeRowsPerPage}
+          onChangePage={handleChangePage}
+          ActionsComponent={TablePaginationActions}
+        />
+      </Paper>
     )
   };
 
