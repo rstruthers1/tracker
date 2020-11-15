@@ -57,6 +57,10 @@ const Foods = (props) => {
     [foods]
   );
 
+  const handleDeleteFood = (event, value) => {
+    alert("Delete food: " + value);
+  };
+
   /**** Column section ***/
   const columns = React.useMemo(
     () => [
@@ -73,11 +77,18 @@ const Foods = (props) => {
       {
         Header: 'Calories',
         accessor: 'calories',
-        disableFilters: true
+        disableFilters: true,
+        Cell: cell => <div style={{ textAlign: "right" }}>{cell.value}</div>
       },
       {
         Header: 'Edit/Delete',
-        disableFilters: true
+        disableFilters: true,
+        Cell: cell =>
+          <div style={{ textAlign: "center" }}>
+            <IconButton onClick={event=> {handleDeleteFood(event, cell.row.index)}} style = {{padding: "0px"}} >
+              <DeleteForeverIcon/>
+            </IconButton>
+          </div>
       },
     ],
     []
@@ -107,10 +118,6 @@ const Foods = (props) => {
     }),
     []
   );
-  
-  const handleDeleteFood = (event, cell) => {
-    alert("Delete food: ");
-  };
 
   const FoodsTable = () => {
     /**** Initialize react-table ****/
@@ -212,13 +219,9 @@ const Foods = (props) => {
             return (
               <TableRow {...row.getRowProps()}>
                 {row.cells.map((cell, index) => {
-                  return <TableCell {...cell.getCellProps()}>
+                  return <TableCell {...cell.getCellProps()} >
                     {
-                        index == 3?
-                          <IconButton onClick={event=> {handleDeleteFood(event, row)}} style = {{padding: "0px"}}>
-                            <DeleteForeverIcon/>
-                          </IconButton> 
-                        : cell.render('Cell')
+                      cell.render('Cell')
                     }
                   </TableCell>
                 })}
