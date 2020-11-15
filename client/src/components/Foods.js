@@ -78,14 +78,14 @@ const Foods = (props) => {
         Header: 'Calories',
         accessor: 'calories',
         disableFilters: true,
-        Cell: cell => <div style={{ textAlign: "right" }}>{cell.value}</div>
+        Cell: row => <div style={{ textAlign: "right" }}>{row.value}</div>
       },
       {
         Header: 'Edit/Delete',
         disableFilters: true,
-        Cell: cell =>
+        Cell: row =>
           <div style={{ textAlign: "center" }}>
-            <IconButton onClick={event=> {handleDeleteFood(event, cell.row.index)}} style = {{padding: "0px"}} >
+            <IconButton onClick={event=> {handleDeleteFood(event, row.index)}} style = {{padding: "0px"}} >
               <DeleteForeverIcon/>
             </IconButton>
           </div>
