@@ -90,7 +90,7 @@ const Foods = (props) => {
     }),
     []
   );
-  
+
   /**** Initialize react-table ****/
   const {
     getTableProps,
@@ -113,36 +113,64 @@ const Foods = (props) => {
     state: { pageIndex, pageSize }
   } = useTable({ columns, data, defaultColumn, initialState: { pageIndex: 0 }, }, useFilters, usePagination);
   
-  /*** Component used for paging through table ***/
-  const TablePageNavigation = () => {
-    return (<>
+  return (
+    <div className="container" style={{paddingBottom: "50px"}}>
+      <h1>Foods</h1>
+      {
+        data ? (
+          <div>
+            <Table {...getTableProps()}>
+              <thead>
+              {headerGroups.map(headerGroup => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map(column => (
+                    <th {...column.getHeaderProps()}>{column.render('Header')}
+                      <span style={{paddingLeft: "10px"}}>{column.canFilter ? column.render('Filter') : null}</span>
+                    </th>
+                  ))}
+                </tr>
+              ))}
+              </thead>
+              <tbody {...getTableBodyProps()}>
+              {page.map((row, i) => {
+                prepareRow(row);
+                return (
+                  <tr {...row.getRowProps()}>
+                    {row.cells.map(cell => {
+                      return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                    })}
+                  </tr>
+                )
+              })}
+              </tbody>
+            </Table>
       <span style={{paddingRight: "10px"}}>
-        <Button onClick={() => gotoPage(0)} disabled={!canPreviousPage} style={{marginRight: "5px"}}>
+              <Button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
           {'<<'}
-        </Button>
-        <Button onClick={() => previousPage()} disabled={!canPreviousPage} style={{marginRight: "5px"}}>
+              </Button>{' '}
+              <Button onClick={() => previousPage()} disabled={!canPreviousPage}>
           {'<'}
-        </Button>
-        <Button onClick={() => nextPage()} disabled={!canNextPage} style={{marginRight: "5px"}}>
+              </Button>{' '}
+              <Button onClick={() => nextPage()} disabled={!canNextPage}>
           {'>'}
-        </Button>
-        <Button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} style={{marginRight: "5px"}}>
+              </Button>{' '}
+              <Button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
           {'>>'}
-        </Button>
+              </Button>{' '}
       </span>
-      <span style={{marginRight: "10px"}}>
+              <span style={{paddingRight: "10px"}}>
           Page{' '}
         <strong>
             {pageIndex + 1} of {pageOptions.length}
           </strong>{' '}
       </span>
-      <span style={{marginRight: "20px"}}>
+              <span style={{paddingRight: "20px"}}>
           Go to page:{' '}
         <input
           type="number"
           defaultValue={pageIndex + 1}
           onChange={e => {
-            const page = e.target.value ? Number(e.target.value) - 1 : 0;
+                    const page = e.target.value ? Number(e.target.value) - 1 : 0
             gotoPage(page)
           }}
           style={{ width: '100px' }}
@@ -160,48 +188,12 @@ const Foods = (props) => {
           </option>
         ))}
       </select>
-      </>);
-  };
   
-  /**** Component for listing foods in a pageable, filterable table ***/
-  const FoodsTable = () => {
-    return (
-      <div>
-        <Table {...getTableProps()}>
-          <thead>
-          {headerGroups.map(headerGroup => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map(column => (
-                <th {...column.getHeaderProps()}>{column.render('Header')}
-                  <span style={{paddingLeft: "10px"}}>{column.canFilter ? column.render('Filter') : null}</span>
-                </th>
-              ))}
-            </tr>
-          ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-          {page.map((row, i) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map(cell => {
-                  return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                })}
-              </tr>
-            )
-          })}
-          </tbody>
-        </Table>
-        <TablePageNavigation/>
       </div>
+          ) :
+          (
+            <div>No foods</div>
     )
-  };
-  
-  return (
-    <div className="container" style={{paddingBottom: "20px"}}>
-      <h1>Foods</h1>
-      {
-        data ? <FoodsTable/> : <div>No foods</div>
       }
     </div>
   )
