@@ -3,14 +3,12 @@
 ## Heroku app
 https://rms-tracker.herokuapp.com/
 
-
 ## References
 
 ### Started with code from these links
 * https://bezkoder.com/react-hooks-jwt-auth/
 * https://bezkoder.com/node-js-rest-api-express-mysql/
 * https://bezkoder.com/node-js-jwt-authentication-mysql/
-
 
 ### MySQL and node - use pool instead of connection
 * https://stackoverflow.com/questions/20210522/nodejs-mysql-error-connection-lost-the-server-closed-the-connection
@@ -37,14 +35,15 @@ https://rms-tracker.herokuapp.com/
 * Sandbox - pagination: https://codesandbox.io/s/github/tannerlinsley/react-table/tree/master/examples/pagination?file=/src/App.js:1984-2288
 * Use memo. Needed for performance reasons for react-table: https://reactjs.org/docs/hooks-reference.html#usememo
 
+### react material-ui
+* Custom page navigation: https://codesandbox.io/s/hier2?file=/demo.js:3830-3951
+* React material-ui plus react-table https://codesandbox.io/s/vigilant-sammet-mj4kr?fontsize=14&hidenavigation=1&theme=dark
+
 ### react-bootstrap table
 * https://react-bootstrap.github.io/components/table/
 
-### react-material-ui
-* Custom page navigation: https://codesandbox.io/s/hier2?file=/demo.js:3830-3951
-
-### Images
-https://codeburst.io/react-image-upload-with-kittens-cc96430eaece
+### Image upload
+* https://codeburst.io/react-image-upload-with-kittens-cc96430eaece
 
 ### debounce
 * https://levelup.gitconnected.com/how-to-debounce-props-with-react-hooks-20db02af53be

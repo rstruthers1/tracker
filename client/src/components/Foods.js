@@ -14,6 +14,7 @@ import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 
 import FoodService from "../services/food.service";
@@ -74,6 +75,10 @@ const Foods = (props) => {
         accessor: 'calories',
         disableFilters: true
       },
+      {
+        Header: 'Edit/Delete',
+        disableFilters: true
+      },
     ],
     []
   );
@@ -102,6 +107,10 @@ const Foods = (props) => {
     }),
     []
   );
+  
+  const handleDeleteFood = (event, cell) => {
+    alert("Delete food: ");
+  };
 
   const FoodsTable = () => {
     /**** Initialize react-table ****/
@@ -202,8 +211,16 @@ const Foods = (props) => {
             prepareRow(row);
             return (
               <TableRow {...row.getRowProps()}>
-                {row.cells.map(cell => {
-                  return <TableCell {...cell.getCellProps()}>{cell.render('Cell')}</TableCell>
+                {row.cells.map((cell, index) => {
+                  return <TableCell {...cell.getCellProps()}>
+                    {
+                        index == 3?
+                          <IconButton onClick={event=> {handleDeleteFood(event, row)}} style = {{padding: "0px"}}>
+                            <DeleteForeverIcon/>
+                          </IconButton> 
+                        : cell.render('Cell')
+                    }
+                  </TableCell>
                 })}
               </TableRow>
             )
