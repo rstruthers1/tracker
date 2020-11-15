@@ -32,6 +32,14 @@ https://rms-tracker.herokuapp.com/
 * https://stackoverflow.com/questions/52984105/react-select-async-loadoptions-is-not-loading-options-properly
 * https://react-select.com/creatable
 
+### react-table
+* Used this for foods page: https://retool.com/blog/building-a-react-table-component/
+* Sandbox - pagination: https://codesandbox.io/s/github/tannerlinsley/react-table/tree/master/examples/pagination?file=/src/App.js:1984-2288
+* Use memo. Needed for performance reasons for react-table: https://reactjs.org/docs/hooks-reference.html#usememo
+
+### react-bootstrap table
+* https://react-bootstrap.github.io/components/table/
+
 ### Images
 https://codeburst.io/react-image-upload-with-kittens-cc96430eaece
 
