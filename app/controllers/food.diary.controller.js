@@ -74,9 +74,25 @@ exports.foodSubmitted = (req, res) => {
 };
 
 exports.deleteFood = (req, res) => {
-  temporal.delay(5000, function() {
-    res.status(200).send("deleteFood response, food id = " + req.params.foodId);
+  let foodId = req.params.id;
+  Food.destroy({
+    where:
+      {id: foodId}
+  }).then(() => {
+    res.status(200).send(
+      {
+        message: "success",
+        foodId: foodId
+      });
+  }).catch(err => {
+    console.log(JSON.stringify(err));
+    res.status(500).send({
+      message: "error",
+      error: err,
+      foodId: foodId
+    })
   });
+  
 };
 
 exports.getAllFoods = (req, res) => {

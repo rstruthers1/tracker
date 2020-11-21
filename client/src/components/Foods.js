@@ -86,13 +86,13 @@ const Foods = (props) => {
   const handleCloseFoodDeleteOk = () => {
     closeFoodDeleteDialog();
     setBackdropOpen(true);
-    FoodService.deleteFood(foodToDelete).then(
+    FoodService.deleteFood(foodToDelete.id).then(
       (response) => {
         console.log(JSON.stringify(response.data));
         setBackdropOpen(false);
       },
       (error) => {
-        alert(error.toString());
+        alert(JSON.stringify(error));
         setBackdropOpen(false);
       }
     );

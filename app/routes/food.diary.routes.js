@@ -23,7 +23,7 @@ module.exports = function(app) {
   );
 
   app.delete(
-    "/api/food/:foodId",
+    "/api/food/:id",
     [authJwt.verifyToken],
     controller.deleteFood
   );
