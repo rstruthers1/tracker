@@ -27,15 +27,16 @@ import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 
+import FoodDelete from "./FoodDelete";
+
 import FoodService from "../services/food.service";
 
 const Foods = (props) => {
 
   const [foods, setFoods] = useState([]);
   const [backdropOpen, setBackdropOpen] = useState(false);
-  const handleBackdropClose = () => {
-    setBackdropOpen(false);
-  };
+  const [foodDeleteOpen, setFoodDeleteOpen] = useState(false);
+  const [foodToDelete, setFoodToDelete] = useState(null);
 
   /**** Row data section ***/
   useEffect(() => {
@@ -72,10 +73,20 @@ const Foods = (props) => {
     [foods]
   );
 
-  const handleDeleteFood = (foodIndex) => {
-    console.log("Delete food: " + foodIndex + ", " + JSON.stringify(foods[foodIndex]));
+  const closeFoodDeleteDialog = () => {
+    setFoodDeleteOpen(false);
+    setFoodToDelete(null);
+  };
+
+  const openFoodDeleteDialog = (food) => {
+    setFoodDeleteOpen(true);
+    setFoodToDelete(food);
+  };
+
+  const handleCloseFoodDeleteOk = () => {
+    closeFoodDeleteDialog();
     setBackdropOpen(true);
-    FoodService.deleteFood(foods[foodIndex].id).then(
+    FoodService.deleteFood(foodToDelete).then(
       (response) => {
         console.log(JSON.stringify(response.data));
         setBackdropOpen(false);
@@ -85,6 +96,19 @@ const Foods = (props) => {
         setBackdropOpen(false);
       }
     );
+  };
+
+  const handleCloseFoodDeleteCancel = () => {
+    closeFoodDeleteDialog();
+  };
+
+  const handleBackdropClose = () => {
+    setBackdropOpen(false);
+  };
+  
+  const handleDeleteFood = (foodIndex) => {
+    console.log("Delete food: " + foodIndex + ", " + JSON.stringify(foods[foodIndex]));
+    openFoodDeleteDialog(foods[foodIndex]);
   };
 
   /**** Column section ***/
@@ -280,8 +304,7 @@ const Foods = (props) => {
   }));
 
   const classes = useStyles();
-
-
+  
   return (
     <div className="container" style={{paddingBottom: "50px"}}>
       <h1>Foods</h1>
@@ -290,6 +313,12 @@ const Foods = (props) => {
         <CircularProgress color="inherit" />
         <h1>Wait, deleting food...</h1>
       </Backdrop>
+      <FoodDelete
+        open = {foodDeleteOpen}
+        handleCloseOk = {handleCloseFoodDeleteOk}
+        handleCloseCancel = {handleCloseFoodDeleteCancel}
+        food = {foodToDelete}
+      />
     </div>
   )
 };
