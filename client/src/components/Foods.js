@@ -1,6 +1,13 @@
 import React, {useEffect, useState} from "react";
 import {useTable, usePagination, useFilters} from 'react-table';
 
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import Paper from "@material-ui/core/Paper";
 import TableContainer from '@material-ui/core/TableContainer';
 import Table from "@material-ui/core/Table";
@@ -10,11 +17,14 @@ import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import IconButton from '@material-ui/core/IconButton';
+
+/*** Icons ***/
 import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 
 import FoodService from "../services/food.service";
@@ -22,6 +32,10 @@ import FoodService from "../services/food.service";
 const Foods = (props) => {
 
   const [foods, setFoods] = useState([]);
+  const [backdropOpen, setBackdropOpen] = useState(false);
+  const handleBackdropClose = () => {
+    setBackdropOpen(false);
+  };
 
   /**** Row data section ***/
   useEffect(() => {
@@ -35,17 +49,18 @@ const Foods = (props) => {
       });
   }, []);
 
-  const populateTableRows = (data) => {
+  const populateTableRows = (theFoods) => {
     let rows = [];
-    if (!data) {
+    if (!theFoods) {
       return rows;
     }
-    for (let i = 0; i < data.length; i++) {
-      let dataItem = data[i];
+    for (let i = 0; i < theFoods.length; i++) {
+      let dataItem = theFoods[i];
       rows.push({
         description: dataItem.description,
         servingSize: dataItem.servingSize,
-        calories: dataItem.calories
+        calories: dataItem.calories,
+        id: dataItem.id
       });
     }
     return rows;
@@ -57,8 +72,19 @@ const Foods = (props) => {
     [foods]
   );
 
-  const handleDeleteFood = (event, value) => {
-    alert("Delete food: " + value);
+  const handleDeleteFood = (foodIndex) => {
+    console.log("Delete food: " + foodIndex + ", " + JSON.stringify(foods[foodIndex]));
+    setBackdropOpen(true);
+    FoodService.deleteFood(foods[foodIndex].id).then(
+      (response) => {
+        console.log(JSON.stringify(response.data));
+        setBackdropOpen(false);
+      },
+      (error) => {
+        alert(error.toString());
+        setBackdropOpen(false);
+      }
+    );
   };
 
   /**** Column section ***/
@@ -85,13 +111,13 @@ const Foods = (props) => {
         disableFilters: true,
         Cell: row =>
           <div style={{ textAlign: "center" }}>
-            <IconButton onClick={event=> {handleDeleteFood(event, row.index)}} style = {{padding: "0px"}} >
+            <IconButton onClick={event=> {handleDeleteFood(row.row.index)}} style = {{padding: "0px"}}>
               <DeleteForeverIcon/>
             </IconButton>
           </div>
       },
     ],
-    []
+    [foods]
   );
 
   /*** Text Filter ***/
@@ -245,10 +271,25 @@ const Foods = (props) => {
     )
   };
 
+  const useStyles = makeStyles((theme) => ({
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: '#fff',
+      pointerEvents: 'none'
+    },
+  }));
+
+  const classes = useStyles();
+
+
   return (
     <div className="container" style={{paddingBottom: "50px"}}>
       <h1>Foods</h1>
       {data ? <FoodsTable/> : <div>No foods</div>}
+      <Backdrop className={classes.backdrop} open={backdropOpen} onClick={handleBackdropClose}>
+        <CircularProgress color="inherit" />
+        <h1>Wait, deleting food...</h1>
+      </Backdrop>
     </div>
   )
 };

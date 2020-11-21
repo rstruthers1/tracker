@@ -32,6 +32,9 @@ const updateFoodDiaryItem = (data) => {
   return axios.put(`/api/food/diary`, data,{ headers: authHeader() })
 };
 
+const deleteFood = (foodId) => {
+  return axios.delete(`/api/food/${foodId}`, { headers: authHeader() })
+};
 
 export default {
   addFood,
@@ -40,5 +43,6 @@ export default {
   getFoodDiary,
   deleteFoodItemFromDiary,
   updateFoodDiaryItem,
-  getFilteredFoods
+  getFilteredFoods,
+  deleteFood
 };

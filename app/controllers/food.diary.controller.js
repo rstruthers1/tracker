@@ -3,7 +3,7 @@ const Food = db.food;
 const FoodDiaryItem = db.foodDiaryItem;
 const { QueryTypes, Op } = require('sequelize');
 const Utils = require('../utils/utils');
-
+const temporal = require("temporal");
 
 exports.foodDiary = (req, res) => {
   console.log("food.diary.controller");
@@ -71,6 +71,12 @@ exports.foodSubmitted = (req, res) => {
     res.status(500).send({ message: err.message });
   })
 
+};
+
+exports.deleteFood = (req, res) => {
+  temporal.delay(5000, function() {
+    res.status(200).send("deleteFood response, food id = " + req.params.foodId);
+  });
 };
 
 exports.getAllFoods = (req, res) => {

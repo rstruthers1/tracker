@@ -21,6 +21,12 @@ module.exports = function(app) {
     [authJwt.verifyToken],
     controller.foodSubmitted
   );
+
+  app.delete(
+    "/api/food/:foodId",
+    [authJwt.verifyToken],
+    controller.deleteFood
+  );
   
 
   app.get("/api/food",
