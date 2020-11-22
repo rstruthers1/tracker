@@ -3,11 +3,6 @@ import {useTable, usePagination, useFilters} from 'react-table';
 
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
 import Paper from "@material-ui/core/Paper";
 import TableContainer from '@material-ui/core/TableContainer';
 import Table from "@material-ui/core/Table";
@@ -24,6 +19,7 @@ import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import EditIcon from '@material-ui/icons/Edit';
 
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 
@@ -120,6 +116,11 @@ const Foods = (props) => {
     openFoodDeleteDialog(foods[foodIndex]);
   };
 
+  const handleEditFood = (foodIndex) => {
+    alert("Edit food: " + foodIndex + ", " + JSON.stringify(foods[foodIndex]));
+   
+  };
+
   /**** Column section ***/
   const columns = React.useMemo(
     () => [
@@ -144,6 +145,9 @@ const Foods = (props) => {
         disableFilters: true,
         Cell: row =>
           <div style={{ textAlign: "center" }}>
+            <IconButton onClick={event=> {handleEditFood(row.row.index)}} style = {{padding: "0px", marginRight: "4px"}}>
+              <EditIcon/>
+            </IconButton>
             <IconButton onClick={event=> {handleDeleteFood(row.row.index)}} style = {{padding: "0px"}}>
               <DeleteForeverIcon/>
             </IconButton>
