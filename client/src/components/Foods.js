@@ -37,18 +37,25 @@ const Foods = (props) => {
   const [backdropOpen, setBackdropOpen] = useState(false);
   const [foodDeleteOpen, setFoodDeleteOpen] = useState(false);
   const [foodToDelete, setFoodToDelete] = useState(null);
+  const [fetchFoodTrigger, setFetchFoodTrigger] = useState(0);
 
   /**** Row data section ***/
   useEffect(() => {
+    console.log("Fetching foods, fetchFoodTrigger = " + fetchFoodTrigger);
     FoodService.getAllFoods().then(
       (response) => {
-        console.log(JSON.stringify(response.data));
+        console.log("Got foods");
         setFoods(response.data);
       },
       (error) => {
-        alert(error.toString());
+        console.log("******ERROR: " + JSON.stringify(error.response));
+        alert(JSON.stringify(error.response));
       });
-  }, []);
+  }, [fetchFoodTrigger]);
+  
+  const triggerFetchFoods = () => {
+    setFetchFoodTrigger(fetchFoodTrigger + 1);
+  };
 
   const populateTableRows = (theFoods) => {
     let rows = [];
@@ -69,13 +76,12 @@ const Foods = (props) => {
 
   // Need to use React.useMemo with react-table for performance reasons.
   const data = React.useMemo(() =>
-      populateTableRows(foods),
+      populateTableRows(foods), 
     [foods]
   );
 
   const closeFoodDeleteDialog = () => {
     setFoodDeleteOpen(false);
-    setFoodToDelete(null);
   };
 
   const openFoodDeleteDialog = (food) => {
@@ -86,14 +92,17 @@ const Foods = (props) => {
   const handleCloseFoodDeleteOk = () => {
     closeFoodDeleteDialog();
     setBackdropOpen(true);
+    
     FoodService.deleteFood(foodToDelete.id).then(
       (response) => {
         console.log(JSON.stringify(response.data));
+        triggerFetchFoods();
         setBackdropOpen(false);
       },
       (error) => {
-        alert(JSON.stringify(error));
         setBackdropOpen(false);
+        console.log(JSON.stringify(error.response));
+        alert(`Error deleting food ${foodToDelete.description}.\n` + error.response.data.message);
       }
     );
   };

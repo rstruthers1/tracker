@@ -86,10 +86,14 @@ exports.deleteFood = (req, res) => {
       });
   }).catch(err => {
     console.log(JSON.stringify(err));
-    res.status(500).send({
-      message: "error",
-      error: err,
-      foodId: foodId
+    let message = err.name;
+    let status = 500;
+    if (err.name == "SequelizeForeignKeyConstraintError") {
+      message = "Cannot delete food as it is in use by another item such as a food diary or recipe.";
+      status = 400;
+    }
+    res.status(status).send({
+      message: message
     })
   });
   
