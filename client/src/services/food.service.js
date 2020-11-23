@@ -3,7 +3,6 @@ import authHeader from "./auth-header";
 
 const API_URL = "/api/food";
 
-
 const addFood = (data) => {
   return axios.post(API_URL , data, { headers: authHeader() });
 };
@@ -16,22 +15,6 @@ const getFilteredFoods = (filter) => {
   return axios.get(`${API_URL}/filter/${filter}` , { headers: authHeader() });
 };
 
-const addFoodsToDiary = (data) => {
-  return axios.post("/api/food/diary", data, { headers: authHeader() })
-};
-
-const getFoodDiary = (date) => {
-  return axios.get(`/api/food/diary?date=${date}`,  { headers: authHeader() })
-};
-
-const deleteFoodItemFromDiary = (foodDiaryItemId) => {
-  return axios.delete(`/api/food/diary?id=${foodDiaryItemId}`, { headers: authHeader() })
-};
-
-const updateFoodDiaryItem = (data) => {
-  return axios.put(`/api/food/diary`, data,{ headers: authHeader() })
-};
-
 const deleteFood = (foodId) => {
   return axios.delete(`/api/food/${foodId}`, { headers: authHeader() })
 };
@@ -39,10 +22,6 @@ const deleteFood = (foodId) => {
 export default {
   addFood,
   getAllFoods,
-  addFoodsToDiary,
-  getFoodDiary,
-  deleteFoodItemFromDiary,
-  updateFoodDiaryItem,
   getFilteredFoods,
   deleteFood
 };

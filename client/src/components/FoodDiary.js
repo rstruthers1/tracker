@@ -9,8 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-
-import FoodService from "../services/food.service";
+import FoodDiaryService from "../services/food.diary.service"
 import DiaryMeal from './DiaryMeal';
 import FoodDiaryUtils from '../utils/food.diary.utils'
 import Styles from './Styles';
@@ -41,7 +40,7 @@ const FoodDiary = (props) => {
   const fetchFoodDiaryItems = date => {
     let theDateString = FoodDiaryUtils.dateToQueryParamValue(date);
 
-    FoodService.getFoodDiary(theDateString).then(
+    FoodDiaryService.getFoodDiary(theDateString).then(
       (response) => {
         console.log(JSON.stringify(response.data));
         setBreakfastItems(FoodDiaryUtils.getMealItems(response.data, mealTypes.BREAKFAST));
@@ -67,7 +66,7 @@ const FoodDiary = (props) => {
 
   const deleteFoodItem = (id) => {
     console.log("Delete food item with id " + id);
-    FoodService.deleteFoodItemFromDiary(id).then(
+    FoodDiaryService.deleteFoodItemFromDiary(id).then(
       (response) => {
         console.log(JSON.stringify(response.data));
         fetchFoodDiaryItems(globalState.foodDiaryDate);
@@ -80,7 +79,7 @@ const FoodDiary = (props) => {
 
   const updateFoodDiaryItem = foodDiaryItem => {
     setOpen(true);
-    FoodService.updateFoodDiaryItem(foodDiaryItem).then(
+    FoodDiaryService.updateFoodDiaryItem(foodDiaryItem).then(
       (response) => {
         console.log(JSON.stringify(response.data));
         fetchFoodDiaryItems(globalState.foodDiaryDate);

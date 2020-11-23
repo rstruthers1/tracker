@@ -23,6 +23,7 @@ import { useHistory } from 'react-router-dom';
 import queryString from "query-string";
 
 import FoodService from "../services/food.service";
+import FoodDiaryService from "../services/food.diary.service"
 import {dateOptions, addFoodDiary} from "../utils/tracker.constants";
 import FoodDiaryUtils from '../utils/food.diary.utils'
 
@@ -263,7 +264,7 @@ const AddFoodToDiary = (props) => {
       let foodDiaryData = {
         foodDiaryData: foodsToAdd
       };
-      FoodService.addFoodsToDiary(foodDiaryData).then(
+      FoodDiaryService.addFoodsToDiary(foodDiaryData).then(
         (response) => {
           console.log("Posted successfully, response is: " + JSON.stringify(response.data));
           history.push(`/food`)

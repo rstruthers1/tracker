@@ -15,29 +15,6 @@ module.exports = function(app) {
     [authJwt.verifyToken],
     controller.foodDiary
   );
-
-  app.post(
-    "/api/food",
-    [authJwt.verifyToken],
-    controller.foodSubmitted
-  );
-
-  app.delete(
-    "/api/food/:id",
-    [authJwt.verifyToken],
-    controller.deleteFood
-  );
-  
-
-  app.get("/api/food",
-    [authJwt.verifyToken],
-    controller.getAllFoods
-  );
-
-  app.get("/api/food/filter/:filterValue",
-    [authJwt.verifyToken],
-    controller.getFoodsFiltered
-  );
   
 
   app.post(
