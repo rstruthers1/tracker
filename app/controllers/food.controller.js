@@ -3,9 +3,7 @@ const Food = db.food;
 const { QueryTypes, Op } = require('sequelize');
 const Utils = require('../utils/utils');
 
-exports.foodSubmitted = (req, res) => {
-  console.log("food.diary.controller");
-  console.log("foodSubmitted!!!");
+exports.createFood = (req, res) => {
   console.log(JSON.stringify(req.body));
   Food.create({
     description: req.body.description,
@@ -17,6 +15,32 @@ exports.foodSubmitted = (req, res) => {
     res.status(500).send({ message: err.message });
   })
 
+};
+
+exports.updateFood = (req, res) => {
+  console.log(JSON.stringify(req.body));
+  let food = req.body;
+  if (!food.id) {
+    res.status(400).send({message: "No food id provided, cannot update"});
+    return;
+  }   
+  Food.update(
+    {
+      description: food.description,
+      servingSize: food.servingSize,
+      calories: food.calories
+    },
+    {
+      where: {
+        id: food.id
+      }
+    }).then(() => {
+    res.status(200).send({message: "food successfully updated"});
+  }).catch(err => {
+    console.log(JSON.stringify(err));
+    res.status(500).send({message: err})
+  });
+  
 };
 
 exports.deleteFood = (req, res) => {

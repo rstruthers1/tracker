@@ -32,6 +32,7 @@ const Foods = (props) => {
 
   const [foods, setFoods] = useState([]);
   const [backdropOpen, setBackdropOpen] = useState(false);
+  const [backdropMessage, setBackdropMessage] = useState("");
   
   const [foodDeleteOpen, setFoodDeleteOpen] = useState(false);
   const [foodToDelete, setFoodToDelete] = useState(null);
@@ -40,7 +41,7 @@ const Foods = (props) => {
   
   const [foodEditOpen, setFoodEditOpen] = useState(false);
   const [foodToEdit, setFoodToEdit] = useState(null);
-
+  
   /**** Row data section ***/
   useEffect(() => {
     console.log("Fetching foods, fetchFoodTrigger = " + fetchFoodTrigger);
@@ -94,6 +95,7 @@ const Foods = (props) => {
   const handleCloseFoodDeleteOk = () => {
     closeFoodDeleteDialog();
     setBackdropOpen(true);
+    setBackdropMessage("Wait, deleting food");
     
     FoodService.deleteFood(foodToDelete.id).then(
       (response) => {
@@ -115,7 +117,20 @@ const Foods = (props) => {
   
   const handleCloseFoodEditOk = (editedFood) => {
     setFoodEditOpen(false);
-    alert(JSON.stringify(editedFood));
+    setBackdropOpen(true);
+    setBackdropMessage("Wait, updating food");
+    FoodService.updateFood(editedFood).then(
+      (response) => {
+        console.log(JSON.stringify(response.data));
+        triggerFetchFoods();
+        setBackdropOpen(false);
+      },
+      (error) => {
+        console.log(JSON.stringify(error.response));
+        setBackdropOpen(false);
+        alert(`Error updating food ${foodToDelete.description}.\n` + error.response.data.message);
+      }
+    );
   };
   
   const handleCloseFoodEditCancel = () => {
@@ -341,7 +356,7 @@ const Foods = (props) => {
       {data ? <FoodsTable/> : <div>No foods</div>}
       <Backdrop className={classes.backdrop} open={backdropOpen} onClick={handleBackdropClose}>
         <CircularProgress color="inherit" />
-        <h1>Wait, deleting food...</h1>
+        <h1>{backdropMessage}</h1>
       </Backdrop>
       <FoodDelete
         open = {foodDeleteOpen}

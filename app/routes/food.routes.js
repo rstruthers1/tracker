@@ -5,7 +5,13 @@ module.exports = function(app) {
   app.post(
     "/api/food",
     [authJwt.verifyToken],
-    controller.foodSubmitted
+    controller.createFood
+  );
+
+  app.patch(
+    "/api/food",
+    [authJwt.verifyToken],
+    controller.updateFood
   );
 
   app.delete(

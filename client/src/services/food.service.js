@@ -7,6 +7,10 @@ const addFood = (data) => {
   return axios.post(API_URL , data, { headers: authHeader() });
 };
 
+const updateFood = (data) => {
+  return axios.patch(API_URL , data, { headers: authHeader() });
+};
+
 const getAllFoods = () => {
   return axios.get(API_URL , { headers: authHeader() });
 };
@@ -23,5 +27,6 @@ export default {
   addFood,
   getAllFoods,
   getFilteredFoods,
-  deleteFood
+  deleteFood,
+  updateFood
 };
