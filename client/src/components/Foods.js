@@ -24,6 +24,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import {makeStyles, useTheme} from "@material-ui/core/styles";
 
 import FoodDelete from "./FoodDelete";
+import FoodEdit from "./FoodEdit";
 
 import FoodService from "../services/food.service";
 
@@ -31,9 +32,14 @@ const Foods = (props) => {
 
   const [foods, setFoods] = useState([]);
   const [backdropOpen, setBackdropOpen] = useState(false);
+  
   const [foodDeleteOpen, setFoodDeleteOpen] = useState(false);
   const [foodToDelete, setFoodToDelete] = useState(null);
+  
   const [fetchFoodTrigger, setFetchFoodTrigger] = useState(0);
+  
+  const [foodEditOpen, setFoodEditOpen] = useState(false);
+  const [foodToEdit, setFoodToEdit] = useState(null);
 
   /**** Row data section ***/
   useEffect(() => {
@@ -106,6 +112,16 @@ const Foods = (props) => {
   const handleCloseFoodDeleteCancel = () => {
     closeFoodDeleteDialog();
   };
+  
+  const handleCloseFoodEditOk = (editedFood) => {
+    setFoodEditOpen(false);
+    alert(JSON.stringify(editedFood));
+  };
+  
+  const handleCloseFoodEditCancel = () => {
+    setFoodEditOpen(false);
+   
+  };
 
   const handleBackdropClose = () => {
     setBackdropOpen(false);
@@ -117,8 +133,9 @@ const Foods = (props) => {
   };
 
   const handleEditFood = (foodIndex) => {
-    alert("Edit food: " + foodIndex + ", " + JSON.stringify(foods[foodIndex]));
-   
+    //alert("Edit food: " + foodIndex + ", " + JSON.stringify(foods[foodIndex]));
+    setFoodToEdit(foods[foodIndex]);
+    setFoodEditOpen(true);
   };
 
   /**** Column section ***/
@@ -331,6 +348,12 @@ const Foods = (props) => {
         handleCloseOk = {handleCloseFoodDeleteOk}
         handleCloseCancel = {handleCloseFoodDeleteCancel}
         food = {foodToDelete}
+      />
+      <FoodEdit
+        open = {foodEditOpen}
+        handleCloseOk = {handleCloseFoodEditOk}
+        handleCloseCancel = {handleCloseFoodEditCancel}
+        food = {foodToEdit}
       />
     </div>
   )
