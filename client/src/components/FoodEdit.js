@@ -20,7 +20,7 @@ const FoodEdit = (props) => {
   return (
     <Modal show={open} onHide={handleCloseCancel}>
       <Modal.Header closeButton>
-        <Modal.Title>Add Food Item</Modal.Title>
+        <Modal.Title>Edit Food Item</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <form onSubmit={handleSubmit(onSubmit)} >

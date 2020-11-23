@@ -1,40 +1,33 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
+
 
 export default function FoodDelete(props) {
   let open = props.open;
   let handleCloseOk = props.handleCloseOk;
   let handleCloseCancel = props.handleCloseCancel;
-  let food = props.food;
+  let food = props.food ? {...props.food} : {};
   
   return (
     <div>
-      <Dialog
-        open={open}
-        onClose={handleCloseCancel}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"Are you sure?"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-           Are you sure you want to delete food {food ? food.description: ""}?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseOk} color="primary">
-            Yes
-          </Button>
-          <Button onClick={handleCloseCancel} color="primary" autoFocus>
-            Cancel
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <Modal show={open} onHide={handleCloseCancel}>
+        <Modal.Header closeButton>
+          <Modal.Title>Are you sure?</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          <p> Are you sure you want to delete food 
+            <span style={{fontWeight: "bold", fontStyle: "italic"}}> {food.description}
+            </span>?
+          </p>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseCancel}>Cancel</Button>
+          <Button variant="primary" onClick={handleCloseOk}>OK</Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
