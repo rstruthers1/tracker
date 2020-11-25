@@ -21,7 +21,6 @@ exports.addMeasurement = (req, res) => {
 
 exports.getAllMeasurements = (req, res) => {
   Measurement.findAll({
-
     order: [['id', 'ASC']]
   }).then(m => {
     res.status(200).send(m);

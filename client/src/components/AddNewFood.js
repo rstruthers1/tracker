@@ -2,6 +2,7 @@ import React, {useCallback, useState, useEffect} from "react";
 import Select from 'react-select';
 import { useForm} from "react-hook-form";
 import FoodService from "../services/food.service";
+import MeasurementService from "../services/measurement-unit";
 
 const measurementList = [
   "Servings",
@@ -15,16 +16,27 @@ const AddNewFood = (props) => {
   const [measurementOptions, setMeasurementOptions] = useState([]);
 
   useEffect(() => {
-    setMeasurements([...measurementList]);
-    resetMeasurementOptions(measurementList);
+
+    MeasurementService.getAllMeasurements().then(
+      (response) => {
+        console.log("Got measurements");
+        //alert(JSON.stringify(response.data));
+        setMeasurements(response.data);
+        resetMeasurementOptions(response.data);
+      },
+      (error) => {
+        console.log("******ERROR: " + JSON.stringify(error.response));
+        alert(JSON.stringify(error.response));
+      });
+    
   }, []);
   
   const resetMeasurementOptions = (m) => {
     let newMeasurementOptions = [];
     m.forEach(mItem => {
       newMeasurementOptions.push(
-        { value: mItem,
-          label: mItem,
+        { value: mItem.id,
+          label: mItem.name,
           color: '#00B8D9',
           isFixed: true },
       )

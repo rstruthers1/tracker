@@ -7,6 +7,11 @@ const addMeasurement= (data) => {
   return axios.post(API_URL , data, { headers: authHeader() });
 };
 
+const getAllMeasurements = () => {
+  return axios.get(API_URL ,  { headers: authHeader() });
+};
+
 export default {
-  addMeasurement
+  addMeasurement,
+  getAllMeasurements
 };
