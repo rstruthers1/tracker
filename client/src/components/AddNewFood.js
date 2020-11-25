@@ -22,6 +22,17 @@ const AddNewFood = (props) => {
         console.log("******ERROR: " + JSON.stringify(error.response));
         alert(JSON.stringify(error.response));
       });
+
+    FoodService.getAllFoods().then(
+      (response) => {
+        console.log("Got foods");
+        alert(JSON.stringify(response.data));
+      },
+      (error) => {
+        console.log("******ERROR: " + JSON.stringify(error.response));
+        alert(JSON.stringify(error.response));
+      });
+    
     
   }, []);
   
