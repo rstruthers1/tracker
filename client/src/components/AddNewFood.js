@@ -10,6 +10,9 @@ const AddNewFood = (props) => {
   const [measurements, setMeasurements] = useState([]);
   const [measurementOptions, setMeasurementOptions] = useState([]);
 
+  const [foods, setFoods] = useState([]);
+  const [foodOptions, setFoodOptions] = useState([]);
+
   useEffect(() => {
 
     MeasurementService.getAllMeasurements().then(
@@ -26,7 +29,8 @@ const AddNewFood = (props) => {
     FoodService.getAllFoods().then(
       (response) => {
         console.log("Got foods");
-        alert(JSON.stringify(response.data));
+        setFoods(response.data);
+        resetFoodOptions(response.data);
       },
       (error) => {
         console.log("******ERROR: " + JSON.stringify(error.response));
@@ -35,6 +39,19 @@ const AddNewFood = (props) => {
     
     
   }, []);
+
+  const resetFoodOptions = (f) => {
+    let newOptions = [];
+    f.forEach(item => {
+      newOptions.push(
+        { value: item.id,
+          label: item.description,
+          color: '#00B8D9',
+          isFixed: true },
+      )
+    });
+    setFoodOptions(newOptions);
+  };
   
   const resetMeasurementOptions = (m) => {
     let newMeasurementOptions = [];
@@ -51,16 +68,17 @@ const AddNewFood = (props) => {
   
   const onSubmit = data => {
     console.log(data);
-    FoodService.addFood(data).then(
-      (response) => {
-          alert("Posted successfully, response is: " + JSON.stringify(response.data));
-          reset()
-      },
-      (error) => {
-        console.log(JSON.stringify(error));
-        alert(JSON.stringify(error));
-      }
-    );
+    alert(JSON.stringify(data));
+    // FoodService.addFood(data).then(
+    //   (response) => {
+    //       alert("Posted successfully, response is: " + JSON.stringify(response.data));
+    //       reset()
+    //   },
+    //   (error) => {
+    //     console.log(JSON.stringify(error));
+    //     alert(JSON.stringify(error));
+    //   }
+    // );
   };
   
   
@@ -69,13 +87,13 @@ const AddNewFood = (props) => {
 
       <div className="container">
 
-        <h1>Enter a New Food</h1>
+        <h1>Enter a New Food Serving</h1>
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="form-group">
-            <label className="control-label col-sm-6" htmlFor="description">Description</label>
+            <label className="control-label col-sm-6" htmlFor="description">Food</label>
             <div className="col-sm-6">
-          <textarea name="description" ref={register} className="form-control" rows="3"></textarea>
+              <Select name={"food"} options={foodOptions}></Select>
             </div>
           </div>
 
