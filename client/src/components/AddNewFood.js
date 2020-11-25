@@ -61,14 +61,7 @@ const AddNewFood = (props) => {
     );
   };
   
-
-
-  const options = [
-    { value: 'teaspoon', label: 'teaspoon' },
-    { value: 'tablespoon', label: 'tablespoon' },
-    { value: 'cup', label: 'cup' }
-    
-  ]
+  
 
   return (
 
