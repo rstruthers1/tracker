@@ -6,22 +6,7 @@ import FoodService from "../services/food.service";
 const measurementList = [
   "Servings",
   "Teaspoons",
-  "Tablespoons",
-  "Cups",
-  "Pieces",
-  "Ounces",
-  "Pounds",
-  "Grams",
-  "Kilograms",
-  "Fluid ounces",
-  "Milliliters",
-  "Liters",
-  "Pints",
-  "Quarts",
-  "Gallons",
-  "Milligrams",
-  "Micrograms",
-  "Grams"
+  
 ];
 
 const AddNewFood = (props) => {

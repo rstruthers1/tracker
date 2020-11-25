@@ -18,3 +18,14 @@ exports.addMeasurement = (req, res) => {
   })
 
 };
+
+exports.getAllMeasurements = (req, res) => {
+  Measurement.findAll({
+
+    order: [['id', 'ASC']]
+  }).then(m => {
+    res.status(200).send(m);
+  }).catch(err => {
+    res.status(500).send("error getting all the foods")
+  });
+};
