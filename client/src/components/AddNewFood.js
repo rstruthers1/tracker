@@ -4,11 +4,6 @@ import { useForm} from "react-hook-form";
 import FoodService from "../services/food.service";
 import MeasurementService from "../services/measurement-unit";
 
-const measurementList = [
-  "Servings",
-  "Teaspoons",
-  
-];
 
 const AddNewFood = (props) => {
   const { register, reset, handleSubmit } = useForm();
@@ -20,7 +15,6 @@ const AddNewFood = (props) => {
     MeasurementService.getAllMeasurements().then(
       (response) => {
         console.log("Got measurements");
-        //alert(JSON.stringify(response.data));
         setMeasurements(response.data);
         resetMeasurementOptions(response.data);
       },
