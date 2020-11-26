@@ -1,12 +1,12 @@
 import React, {useCallback, useState, useEffect} from "react";
 import Select from 'react-select';
-import { useForm} from "react-hook-form";
+import { useForm, Controller} from "react-hook-form";
 import FoodService from "../services/food.service";
 import MeasurementService from "../services/measurement-unit";
 
 
 const AddNewFood = (props) => {
-  const { register, reset, handleSubmit } = useForm();
+  const { register, reset, handleSubmit, control } = useForm();
   const [measurements, setMeasurements] = useState([]);
   const [measurementOptions, setMeasurementOptions] = useState([]);
 
@@ -93,7 +93,13 @@ const AddNewFood = (props) => {
           <div className="form-group">
             <label className="control-label col-sm-6" htmlFor="description">Food</label>
             <div className="col-sm-6">
-              <Select name={"food"} options={foodOptions}></Select>
+              <Controller
+                name="food"
+                as={Select}
+                options={foodOptions}
+                control={control}
+                rules={{required: true}}
+                />
             </div>
           </div>
 
@@ -103,10 +109,16 @@ const AddNewFood = (props) => {
               <div className="form-row">
               
                 <div className="col col-sm-3">
-              <input className="form-control" />
+                  <input name="numMeasurementUnits" ref={register} className="form-control" />
                 </div>
                 <div className="col">
-                  <Select name={"measurement"} options={measurementOptions}></Select>
+                  <Controller
+                    name="measurementUnit"
+                    as={Select}
+                    options={measurementOptions}
+                    control={control}
+                    rules={{required: true}}
+                  />
                 </div>
               </div>
             </div>
