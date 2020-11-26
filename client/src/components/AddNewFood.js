@@ -2,6 +2,7 @@ import React, {useCallback, useState, useEffect} from "react";
 import Select from 'react-select';
 import { useForm, Controller} from "react-hook-form";
 import FoodService from "../services/food.service";
+import FoodServingService from "../services/food.serving.service";
 import MeasurementService from "../services/measurement-unit";
 
 
@@ -65,20 +66,28 @@ const AddNewFood = (props) => {
     });
     setMeasurementOptions(newMeasurementOptions);
   };
-  
+
+  //{"numMeasurementUnits":"1","calories":"100",
+  //"food":{"value":1351,"label":"Butter","color":"#00B8D9","isFixed":true},"measurementUnit":{"value":91,"label":"Tablespoons","color":"#00B8D9","isFixed":true}}
   const onSubmit = data => {
     console.log(data);
-    alert(JSON.stringify(data));
-    // FoodService.addFood(data).then(
-    //   (response) => {
-    //       alert("Posted successfully, response is: " + JSON.stringify(response.data));
-    //       reset()
-    //   },
-    //   (error) => {
-    //     console.log(JSON.stringify(error));
-    //     alert(JSON.stringify(error));
-    //   }
-    // );
+    //alert(JSON.stringify(data));
+    let foodServing = {
+      numMeasurementUnits: data.numMeasurementUnits,
+      calories: data.calories,
+      foodId:  data.food.value,
+      measurementId: data.measurementUnit.value
+    };
+    FoodServingService.addFoodServing(foodServing).then(
+      (response) => {
+          alert("Posted successfully, response is: " + JSON.stringify(response.data));
+          
+      },
+      (error) => {
+        console.log(JSON.stringify(error));
+        alert(JSON.stringify(error));
+      }
+    );
   };
   
   

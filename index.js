@@ -55,6 +55,7 @@ require('./app/routes/image.routes')(app);
 require('./app/routes/wakeup.routes')(app);
 require('./app/routes/measurement.routes')(app);
 require('./app/routes/food.routes')(app);
+require('./app/routes/food.serving.routes')(app);
 
 
 // simple route
