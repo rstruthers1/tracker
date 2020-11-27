@@ -76,6 +76,10 @@ https://rms-tracker.herokuapp.com/
 ### Nutrition labels
 * https://www.onlinelabels.com/tools/nutrition-label-generator
 
+### Database design
+* https://dev.to/amckean12/designing-a-relational-database-for-a-cookbook-4nj6
+* https://www.reddit.com/r/compsci/comments/9kmren/has_anyone_tried_to_create_a_recipe_database_im/
+
 
 
 

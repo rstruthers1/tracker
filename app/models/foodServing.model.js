@@ -32,7 +32,7 @@ module.exports = (sequelize, Sequelize) => {
     calories: {
       type: DataTypes.INTEGER
     },
-    numMeasurementUntis: {
+    numMeasurementUnits: {
       type: DataTypes.DECIMAL(12,6)
     },
   });
