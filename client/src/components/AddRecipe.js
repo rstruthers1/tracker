@@ -1,6 +1,6 @@
-import React, {useCallback, useState, useEffect} from "react";
+import React, {useState, useEffect} from "react";
 
-import {useForm, Controller} from "react-hook-form";
+import {useForm} from "react-hook-form";
 
 import Table from 'react-bootstrap/Table';
 import Spinner from 'react-bootstrap/Spinner'
@@ -26,9 +26,11 @@ import RecipeService from "../services/recipe.service";
 import ImageService from "../services/image.service";
 
 import Image from './Image'
+import MeasurementService from "../services/measurement-unit";
+import Select from "react-select";
 
 const AddRecipe = (props) => {
-  const {register, handleSubmit, errors, reset, control} = useForm();
+  const {register, handleSubmit, errors, reset} = useForm();
   const classes = Styles.useStyles();
   
   const [recipeItems, setRecipeItems] = useState([]);
@@ -39,6 +41,25 @@ const AddRecipe = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [picture, setPicture] = useState(null);
   const [isPictureLoading, setIsPictureLoading] = useState(false);
+  const [measurements, setMeasurements] = useState([]);
+  const [measurementOptions, setMeasurementOptions] = useState([]);
+
+  const resetMeasurementOptions = (m) => {
+    let newMeasurementOptions = [];
+    if (!m) {
+      setMeasurementOptions([]);
+      return;
+    }
+    m.forEach(mItem => {
+      newMeasurementOptions.push(
+        { value: mItem.id,
+          label: mItem.name,
+          color: '#00B8D9',
+          isFixed: true },
+      )
+    });
+    setMeasurementOptions(newMeasurementOptions);
+  };
   
 
   const resetFoodOptions = (foodItems) => {
@@ -88,7 +109,7 @@ const AddRecipe = (props) => {
     console.log("data: " + JSON.stringify(data));
     console.log("picture: " + picture);
     
-    if (recipeItems.length == 0) {
+    if (recipeItems.length === 0) {
       alert("You must add at least one ingredient");
       return;
     }
@@ -173,6 +194,10 @@ const AddRecipe = (props) => {
     let newFoodItem = {...foodItem};
     setFoodSelection(selectedFoodOption, recipeItemId, newFoodItem);
   };
+
+  const handleMeasurementChanged = (selectedMeasurementOption, actionMetadata, recipeItemId) => {
+    console.log("handleMeasurementChanged: " + JSON.stringify(selectedMeasurementOption, null, 2));
+  };
   
   const handleCreateNewFoodItem = (partialDescriptionInputValue, recipeItemId) => {
     setIsLoading(true);
@@ -219,6 +244,7 @@ const AddRecipe = (props) => {
   const fetchAllFoods = () => {
     FoodService.getAllFoods().then(
       (response) => {
+        console.log(JSON.stringify(response.data, null, 2));
         setFoodItems(response.data);
         resetFoodOptions(response.data);
         setIsLoading(false);
@@ -228,10 +254,23 @@ const AddRecipe = (props) => {
         setIsLoading(false);
       }
     );
+
+
   };
 
   useEffect(() => {
     fetchAllFoods();
+    MeasurementService.getAllMeasurements().then(
+      (response) => {
+        console.log("Got measurements");
+       // console.log(JSON.stringify(response.data, null,2));
+        setMeasurements(response.data);
+        resetMeasurementOptions(response.data);
+      },
+      (error) => {
+        console.log("******ERROR: " + JSON.stringify(error.response));
+        alert(JSON.stringify(error.response));
+      });
   }, []);
   
   const handleAddRow = event => {
@@ -353,6 +392,22 @@ const AddRecipe = (props) => {
       }
     );
   };
+
+  const findMeasurementOption = (value) => {
+    console.log("findMeasurementOption, value: " + JSON.stringify(value, null, 2));
+    console.log("*** measurementOptions: " + JSON.stringify(measurementOptions));
+    let foundOption = {};
+    for (let i = 0; i < measurementOptions.length; i++) {
+      let currentOption = measurementOptions[i];
+     // console.log("currentOption: " + JSON.stringify(currentOption, null, 2));
+      if (currentOption.value === value) {
+        foundOption = {...currentOption};
+        break;
+      }
+    }
+    console.log("foundOption: " + JSON.stringify(foundOption, null, 2));
+    return foundOption;
+  };
   
   const removeImage = () => {
     setPicture(null);
@@ -425,7 +480,7 @@ const AddRecipe = (props) => {
       
             <tr>
               <th style={{width: recipeCellWidths.SERVINGS, border: "hidden"}}>Ingredients</th>
-              <th style={{width: recipeCellWidths.DESCRIPTION, border: "hidden"}}></th>
+              <th style={{width: "150px", border: "hidden"}}></th>
               <th style={{width: recipeCellWidths.COMMENT, border: "hidden"}}></th>
               <th style={{width: recipeCellWidths.CALORIES, border: "hidden"}}></th>
               <th style={{width: recipeCellWidths.DELETE, border: "hidden"}}>
@@ -448,7 +503,8 @@ const AddRecipe = (props) => {
               <thead>
               <tr>
                 <th style={{width: recipeCellWidths.SERVINGS}}>Servings</th>
-                <th style={{width: recipeCellWidths.DESCRIPTION}}>Description</th>
+                <th style={{width: "150px"}}>Unit</th>
+                <th style={{width: "150px"}}>Description</th>
                 <th style={{width: recipeCellWidths.COMMENT}}>Comment</th>
                 <th style={{width: recipeCellWidths.CALORIES}}>Calories</th>
                 <th style={{width: recipeCellWidths.DELETE}}>Delete</th>
@@ -461,6 +517,12 @@ const AddRecipe = (props) => {
                     <input name={"servings-" + row.recipeItemId} type="number" step="0.001" min="0" ref={register({required: true})} className="form-control" 
                            defaultValue={row.servings}
                     onBlur={event => handleServingsOnBlur(event, row.recipeItemId)}/>
+                  </td>
+                  <td>
+                    <Select
+                      options={measurementOptions}
+                      onChange={(value, actionMetadata) => handleMeasurementChanged(value, actionMetadata, row.recipeItemId)}
+                    />
                   </td>
                   <td>
                     <CreatableSelect

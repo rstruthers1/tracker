@@ -58,6 +58,7 @@ require('./app/routes/food.routes')(app);
 require('./app/routes/food.serving.routes')(app);
 
 
+
 // simple route
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to rms-tracker service." });

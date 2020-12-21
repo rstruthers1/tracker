@@ -1,18 +1,19 @@
-import React, {useCallback, useState, useEffect} from "react";
+import React, {useState, useEffect} from "react";
 import Select from 'react-select';
 import { useForm, Controller} from "react-hook-form";
+import _ from "lodash/fp";
+
 import FoodService from "../services/food.service";
-import FoodServingService from "../services/food.serving.service";
 import MeasurementService from "../services/measurement-unit";
 
 
+
 const AddNewFood = (props) => {
-  const { register, reset, handleSubmit, control } = useForm();
+  const { register, handleSubmit, control, errors } = useForm();
   const [measurements, setMeasurements] = useState([]);
   const [measurementOptions, setMeasurementOptions] = useState([]);
 
-  const [foods, setFoods] = useState([]);
-  const [foodOptions, setFoodOptions] = useState([]);
+ 
 
   useEffect(() => {
 
@@ -26,34 +27,10 @@ const AddNewFood = (props) => {
         console.log("******ERROR: " + JSON.stringify(error.response));
         alert(JSON.stringify(error.response));
       });
-
-    FoodService.getAllFoods().then(
-      (response) => {
-        console.log("Got foods");
-        setFoods(response.data);
-        resetFoodOptions(response.data);
-      },
-      (error) => {
-        console.log("******ERROR: " + JSON.stringify(error.response));
-        alert(JSON.stringify(error.response));
-      });
-    
     
   }, []);
 
-  const resetFoodOptions = (f) => {
-    let newOptions = [];
-    f.forEach(item => {
-      newOptions.push(
-        { value: item.id,
-          label: item.description,
-          color: '#00B8D9',
-          isFixed: true },
-      )
-    });
-    setFoodOptions(newOptions);
-  };
-  
+    
   const resetMeasurementOptions = (m) => {
     let newMeasurementOptions = [];
     m.forEach(mItem => {
@@ -67,21 +44,36 @@ const AddNewFood = (props) => {
     setMeasurementOptions(newMeasurementOptions);
   };
 
-  //{"numMeasurementUnits":"1","calories":"100",
-  //"food":{"value":1351,"label":"Butter","color":"#00B8D9","isFixed":true},"measurementUnit":{"value":91,"label":"Tablespoons","color":"#00B8D9","isFixed":true}}
+
+/*
+  {
+    "description": "Butter",
+    "numMeasurementUnits": "1",
+    "grams": "227",
+    "calories": "1627",
+    "measurementUnit": {
+    "value": 101,
+      "label": "Cups",
+      "color": "#00B8D9",
+      "isFixed": true
+    }
+  }
+  
+  */
+
   const onSubmit = data => {
-    console.log(data);
-    //alert(JSON.stringify(data));
-    let foodServing = {
+    console.log(JSON.stringify(data, null, 2));
+    let food = {
+      description: data.description,
       numMeasurementUnits: data.numMeasurementUnits,
+      grams: data.grams,
       calories: data.calories,
-      foodId:  data.food.value,
-      measurementId: data.measurementUnit.value
+      measurementUnitId: data.measurementUnit.value
     };
-    FoodServingService.addFoodServing(foodServing).then(
+    console.log(JSON.stringify(food));
+    FoodService.addFood(food).then(
       (response) => {
           alert("Posted successfully, response is: " + JSON.stringify(response.data));
-          
       },
       (error) => {
         console.log(JSON.stringify(error));
@@ -96,30 +88,40 @@ const AddNewFood = (props) => {
 
       <div className="container">
 
-        <h1>Enter a New Food Serving</h1>
+        <h1>Enter a New Food</h1>
 
         <form onSubmit={handleSubmit(onSubmit)}>
+          
           <div className="form-group">
-            <label className="control-label col-sm-6" htmlFor="description">Food</label>
+            <label className="control-label col-sm-6" htmlFor="description">Food Description</label>
             <div className="col-sm-6">
-              <Controller
-                name="food"
-                as={Select}
-                options={foodOptions}
-                control={control}
-                rules={{required: true}}
-                />
+              <input name="description" ref={register({required: true, minLength: 3})} className="form-control"/>
+              {_.get("description.type", errors) === "required" && (
+                <p className="error">Description is required</p>
+              )}
+              {_.get("description.type", errors) === "minLength" && (
+                <p className="error">Description must have at least 3 characters</p>
+              )}
+              </div>
             </div>
-          </div>
+
+         
 
           <div className="form-group">
             <label className="control-label col-sm-6" htmlFor="servingSie">Serving Size</label>
             <div className="col-sm-6">
               <div className="form-row">
-              
+               
                 <div className="col col-sm-3">
-                  <input name="numMeasurementUnits" ref={register} className="form-control" />
-                </div>
+                  <input name="numMeasurementUnits" type="number" step=".001" ref={register({ min: 0, required: true })} className="form-control" />
+                  {_.get("numMeasurementUnits.type", errors) === "required" && (
+                    <p className="error">Serving Size is required</p>
+                  )}
+                  {_.get("numMeasurementUnits.type", errors) === "min" && (
+                    <p className="error">Serving Size cannot be negative</p>
+                  )}
+                  
+            </div>
                 <div className="col">
                   <Controller
                     name="measurementUnit"
@@ -128,23 +130,49 @@ const AddNewFood = (props) => {
                     control={control}
                     rules={{required: true}}
                   />
-                </div>
+                  {_.get("measurementUnit.type", errors) === "required" && (
+                    <p className="error">Serving Size Unit is required</p>
+                  )}
+                  
               </div>
+            </div>
+              </div>
+            </div>
+
+          <div className="form-group">
+            <label className="control-label col-sm-6" htmlFor="grams">Weight in Grams</label>
+            <div className="col-sm-6">
+              <input name="grams" className="form-control" 
+                     type="number" step=".001" ref={register({ min: 0, required: true })}/>
+              {_.get("grams.type", errors) === "required" && (
+                <p className="error">Weight in Grams is required</p>
+              )}
+              {_.get("grams.type", errors) === "min" && (
+                <p className="error">Weight in Grams cannot be negative</p>
+              )}
             </div>
           </div>
 
           <div className="form-group">
             <label className="control-label col-sm-6" htmlFor="description">Calories</label>
             <div className="col-sm-6">
-              <input name="calories" ref={register} className="form-control"/>
-            </div>
-          </div>
+              <input name="calories" className="form-control"
+                     type="number"  ref={register({ min: 0, required: true })}/>
+              {_.get("calories.type", errors) === "required" && (
+                <p className="error">Calories is required</p>
+              )}
+              {_.get("calories.type", errors) === "min" && (
+                <p className="error">Calories cannot be negative</p>
+              )}
+              </div>
+              </div>
 
           <div className="form-group">
             <div className="col-sm-6">
           <button type="submit" style={{backgroundColor: '#00548F'}} className="btn btn-primary btn-block">Submit</button>
+              </div>
             </div>
-          </div>
+          
         </form>
 
     </div>

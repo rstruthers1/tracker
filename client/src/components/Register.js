@@ -100,7 +100,7 @@ const Register = (props) => {
     }
   };
   
-  const sigunup = () => {
+  const signup = () => {
     return (
     <div className="col-md-12">
       <div className="card card-container">

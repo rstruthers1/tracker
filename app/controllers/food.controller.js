@@ -5,14 +5,16 @@ const Utils = require('../utils/utils');
 
 exports.createFood = (req, res) => {
   console.log(JSON.stringify(req.body));
+  let food = req.body;
   Food.create({
-    description: req.body.description,
-    servingSize: req.body.servingSize,
-    calories: req.body.calories
+    description: food.description,
+    servingSize: food.servingSize,
+    calories: food.calories,
+    grams: food.grams
   }). then(food => {
     res.status(200).send(food);
   }).catch( err => {
-    res.status(500).send({ message: err.message });
+    res.status(500).send(err);
   })
 
 };
@@ -28,7 +30,8 @@ exports.updateFood = (req, res) => {
     {
       description: food.description,
       servingSize: food.servingSize,
-      calories: food.calories
+      calories: food.calories,
+      grams: food.grams
     },
     {
       where: {
@@ -71,12 +74,12 @@ exports.deleteFood = (req, res) => {
 
 exports.getAllFoods = (req, res) => {
   Food.findAll({
-
     order: [['description', 'ASC']]
   }).then(foods => {
     res.status(200).send(foods);
   }).catch(err => {
-    res.status(500).send("error getting all the foods")
+    console.log(JSON.stringify(err));
+    res.status(500).send(err);
   });
 };
 

@@ -12,6 +12,7 @@ const updateFood = (data) => {
 };
 
 const getAllFoods = () => {
+  console.log("*** getAllFoods")
   return axios.get(API_URL , { headers: authHeader() });
 };
 

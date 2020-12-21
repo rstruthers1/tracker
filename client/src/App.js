@@ -1,7 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Switch, Route, Link } from "react-router-dom";
+
+import useSWR, { SWRConfig } from 'swr'
+
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
+
 
 import AuthService from "./services/auth.service";
 
@@ -16,8 +20,9 @@ import AddRecipe from "./components/AddRecipe";
 import Recipes from "./components/Recipes";
 import WakeUp from './components/WakeUp';
 import WakeUpService from './services/wakeup.service';
-import AddMeasurementUnit from "./components/AddMeaurementUnit";
 import Foods from "./components/Foods";
+import EditableFoodGrouping from "./components/EditableFoodGrouping";
+
 
 
 
@@ -26,15 +31,6 @@ const App = () => {
   const [wakingUp, setWakingUp] = useState(true);
   const [seconds, setSeconds] = useState(5);
   const [isActive, setIsActive] = useState(true);
-
-  function toggle() {
-    setIsActive(!isActive);
-  }
-
-  function reset() {
-    setSeconds(0);
-    setIsActive(false);
-  }
   
   const wakeupPoll = () => {
     console.log("Calling wakeup");
@@ -50,14 +46,14 @@ const App = () => {
     );
   };
   
-  
-
   useEffect(() => {
     
     const user = AuthService.getCurrentUser();
     if (user) {
       setCurrentUser(user);
     }
+    
+    
 
     let interval = null;
     if (isActive) {
@@ -76,6 +72,7 @@ const App = () => {
   };
 
   return (wakingUp ? (<WakeUp/>) :(
+   
     <div>
       <nav className="navbar navbar-expand navbar-dark bg-dark">
         <Link to={"/"} className="navbar-brand">
@@ -124,8 +121,8 @@ const App = () => {
           )}
           {currentUser && (
             <li className="nav-item">
-              <Link to={"/addMeasurementUnit"} className="nav-link">
-                New Measurement Unit
+              <Link to={"/efg"} className="nav-link">
+                EFG
               </Link>
             </li>
           )}
@@ -172,11 +169,12 @@ const App = () => {
           <Route path="/addFoodToDiary" component={AddFoodToDiary}/>
           <Route path="/addRecipe" component={AddRecipe}/>
           <Route path="/recipes" component={Recipes}/>
-          <Route path="/addMeasurementUnit" component={AddMeasurementUnit}/>
           <Route path="/foods" component={Foods}/>
+          <Route path="/efg" component={EditableFoodGrouping}/>
         </Switch>
       </div>
     </div>
+    
   ));
 };
 
