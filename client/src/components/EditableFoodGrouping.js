@@ -12,6 +12,7 @@ import IconButton from "@material-ui/core/IconButton";
 import axios from "axios";
 import authHeader from "../services/auth-header";
 import useSWR from "swr";
+import {unit} from "mathjs";
 
 
 const unitCookingVolume = [
@@ -102,7 +103,8 @@ const EditableFoodGrouping = (props) => {
       foodItemId: foodItem.foodItemId,
       amount: foodItem.amount,
       unit: {...(foodItem.unit)},
-      food: {...(foodItem.food)}
+      food: {...(foodItem.food)},
+      comment: foodItem.comment
     };
     return newFoodItem;
   };
@@ -112,7 +114,8 @@ const EditableFoodGrouping = (props) => {
       foodItemId: foodItem.foodItemId,
       amount: (accessor === "amount") ? value : foodItem.amount,
       unit: (accessor === "unit") ? {...value} : {...(foodItem.unit)},
-      food: (accessor === "food") ? {...value} : {...(foodItem.food)}
+      food: (accessor === "food") ? {...value} : {...(foodItem.food)},
+      comment: (accessor === "comment") ? value : foodItem.comment
     }
   };
   
@@ -243,7 +246,6 @@ const EditableFoodGrouping = (props) => {
       ...provided,
       whiteSpace: "normal",
       fontSize: "12px",
-      
       height: "22px",
       paddingBottom: "14px",
       paddingTop: "0px"
@@ -281,7 +283,10 @@ const EditableFoodGrouping = (props) => {
     )
   };
 
- 
+  let unitWidth = "150px";
+  let commentWidth = "200px";
+  let foodWidth = "350px";
+  
   return (
     <div>
       { props.header &&
@@ -298,7 +303,12 @@ const EditableFoodGrouping = (props) => {
 
       <table style={{maxWidth: "800px"}}>
         <thead>
-          <tr><th style={{width: "100px"}}>Amount</th><th style={{width: "200px"}}>Unit</th><th style={{width: "300px"}}>Food</th><th style={{width: "100px"}}>Calories</th><th>Delete</th></tr>
+          <tr><th style={{width: "100px"}}>Amount</th>
+            <th style={{width: unitWidth}}>Unit</th>
+            <th style={{width: foodWidth }}>Food</th>
+            <th style={{width: commentWidth}}>Comment</th>
+            <th style={{width: "100px"}}>Calories</th>
+            <th>Delete</th></tr>
         </thead>
   
         <tbody>
@@ -317,7 +327,7 @@ const EditableFoodGrouping = (props) => {
                     row.error && row.error.amount && <p style={{fontSize: "12px", fontWeight: "bold", color: "red"}}>{row.error.amount}</p>
                   }
                 </td>
-                <td style={{verticalAlign: "top", width: "200px"}}>
+                <td style={{verticalAlign: "top", width: unitWidth}}>
                  
                     <Select
                       options = {row.food.allowedUnits}
@@ -327,15 +337,27 @@ const EditableFoodGrouping = (props) => {
                       
                     />
                 </td>
-                <td style={{verticalAlign: "top", width: "300px"}} >
+                <td style={{verticalAlign: "top", width: foodWidth }} >
                
                     <Select
                       options = {populateFoodOptions(foods)}
                       onChange = {(value, actionMetadata) => handleUpdateFoodItem("food", value, row.foodItemId)}
                       value={row.food}
                       styles={reactSelectStyles}
+                     
                     />
                 
+                </td>
+                <td style={{verticalAlign: "top", width: commentWidth}}>
+                  <CellInput
+                    value = {row.comment ? row.comment : ""}
+                    onBlur = {handleUpdateFoodItem}
+                    accessor = "comment"
+                    foodItemId = {row.foodItemId}
+                  />
+                  {
+                    row.error && row.error.amount && <p style={{fontSize: "12px", fontWeight: "bold", color: "red"}}>{row.error.comment}</p>
+                  }
                 </td>
                 <td>
                   <div style={{ textAlign: "right", width: "100px", fontSize: "12px", paddingRight: "30px"}}>{row.calories}</div>
@@ -348,9 +370,12 @@ const EditableFoodGrouping = (props) => {
               </tr>
             )
           })}
-        <tr><td style={{width: "100px"}}></td><td style={{width: "200px"}}></td>
-          <td style={{width: "300px", fontWeight: "bold", textAlign: "right", fontSize: "12px", height: "32px", paddingTop: "10px"}}>Total Calories</td>
-          <td style={{width: "100px", textAlign: "right", fontSize: "12px", paddingRight: "30px", height: "32px", paddingTop: "10px"}}>{totalCalories}</td><td></td></tr>
+        <tr><td style={{width: "100px"}}></td>
+          <td style={{width: unitWidth}}></td>
+          <td style={{width: foodWidth }}></td>
+          <td style={{width: commentWidth, fontWeight: "bold", textAlign: "right", fontSize: "12px", height: "32px", paddingTop: "10px"}}>Total Calories</td>
+          <td style={{width: "100px", textAlign: "right", fontSize: "12px", paddingRight: "30px", height: "32px", paddingTop: "10px"}}>{totalCalories}</td>
+          <td></td></tr>
         </tbody>
       </table>
      
