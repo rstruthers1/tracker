@@ -12,7 +12,7 @@ import IconButton from "@material-ui/core/IconButton";
 import axios from "axios";
 import authHeader from "../services/auth-header";
 import useSWR from "swr";
-import {unit} from "mathjs";
+
 
 
 const unitCookingVolume = [
@@ -62,7 +62,7 @@ const genericFoodItem = {
 const fetcher = (url) => axios.get(url, { headers: authHeader() }).
 then((res) => {
 
-    console.log("*** fetcher - Fetched data: " + JSON.stringify(res.data))
+    console.log("*** fetcher - Fetched data: ")
     return res.data;
   },
   (error) => {
@@ -75,7 +75,7 @@ const EditableFoodGrouping = (props) => {
   const [foodItems, setFoodItems] = useState([]);
   const [shouldShowPrompt, setShouldShowPrompt] = useState(false);
   const [totalCalories, setTotalCalories] = useState("");
-  const { data:foods, error, isValidating, mutate } = useSWR("/api/food", fetcher);
+  const { data:foods} = useSWR("/api/food", fetcher);
   
   useEffect(() => {
     populateFoodItemsWithOptionalUpdate("none",[]);
@@ -259,6 +259,12 @@ const EditableFoodGrouping = (props) => {
         padding: "0px"
       }
     ),
+    menuList: (provided, state) => (
+      {
+        ...provided,
+        backgroundColor: "white"
+      }
+    ),
     control: (provided, state) => (
       {
         ...provided,
@@ -285,7 +291,7 @@ const EditableFoodGrouping = (props) => {
 
   let unitWidth = "150px";
   let commentWidth = "200px";
-  let foodWidth = "350px";
+  let foodWidth = "500px";
   
   return (
     <div>
@@ -301,7 +307,7 @@ const EditableFoodGrouping = (props) => {
       </Button>
       </div>
 
-      <table style={{maxWidth: "800px"}}>
+      <table style={{maxWidth: "900px"}}>
         <thead>
           <tr><th style={{width: "100px"}}>Amount</th>
             <th style={{width: unitWidth}}>Unit</th>
@@ -344,6 +350,7 @@ const EditableFoodGrouping = (props) => {
                       onChange = {(value, actionMetadata) => handleUpdateFoodItem("food", value, row.foodItemId)}
                       value={row.food}
                       styles={reactSelectStyles}
+                      onMouseOver={event => {console.log("hover!")}}
                      
                     />
                 

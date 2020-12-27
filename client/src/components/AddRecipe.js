@@ -1,368 +1,111 @@
 import React, {useState, useEffect} from "react";
+import { Prompt } from 'react-router';
 
 import {useForm} from "react-hook-form";
-
-import Table from 'react-bootstrap/Table';
 import Spinner from 'react-bootstrap/Spinner'
-
-import IconButton from "@material-ui/core/IconButton";
-import DeleteIcon from "@material-ui/icons/Delete";
-import Tooltip from "@material-ui/core/Tooltip";
-
-import CreatableSelect from 'react-select/creatable';
-import AsyncCreatableSelect from 'react-select/async-creatable';
-
 import _ from "lodash/fp";
-import {v4 as uuidv4} from 'uuid';
 
-import Styles from './Styles';
-
-import NewFoodFormModal from "./NewFoodFormModal";
-
-import {recipeCellWidths} from "../utils/tracker.constants";
-
-import FoodService from "../services/food.service";
-import RecipeService from "../services/recipe.service";
 import ImageService from "../services/image.service";
-
 import Image from './Image'
-import MeasurementService from "../services/measurement-unit";
+import CaloriesConverter from "../utils/calories.converter.util";
+import axios from "axios";
+import authHeader from "../services/auth-header";
+import useSWR from "swr";
+import {v4 as uuidv4} from "uuid";
+import Button from "react-bootstrap/Button";
 import Select from "react-select";
+import IconButton from "@material-ui/core/IconButton";
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
+
+import ReactQuill from 'react-quill';
+
+
+
+const unitCookingVolume = [
+  ...(CaloriesConverter.getCookingUnitsByMeasure("volume"))
+];
+
+const unitCookingWeight = [
+  ...(CaloriesConverter.getCookingUnitsByMeasure("mass"))
+];
+
+const servingUnit = {
+
+  "abbr": "Serving",
+  "measure": "volume",
+  "system": "imperial",
+  "singular": "Serving",
+  "plural": "Serving",
+  "label": "Serving",
+  "value": "Serving"
+
+};
+
+const allCookingUnits = [
+  ...unitCookingVolume, ...unitCookingWeight
+];
+
+
+const genericFoodItem = {
+  foodItemId: "0",
+  amount: "1",
+  unit: {
+    ...servingUnit
+  },
+  food: {
+    label: "",
+    value: "Generic",
+    volumeUnit: "Serving",
+    volumeAmount: "1",
+    defaultUnit: "Serving",
+    grams: 0,
+    calories: 0,
+    allowedUnits: [...allCookingUnits]
+  },
+
+};
+
+const fetcher = (url) => axios.get(url, { headers: authHeader() }).
+then((res) => {
+
+    console.log("*** fetcher - Fetched data: ")
+    return res.data;
+  },
+  (error) => {
+    console.log("****** fetcher - ERROR: " + JSON.stringify(error.response));
+    return error.response;
+  }
+);
 
 const AddRecipe = (props) => {
-  const {register, handleSubmit, errors, reset} = useForm();
-  const classes = Styles.useStyles();
-  
-  const [recipeItems, setRecipeItems] = useState([]);
-  const [foodItems, setFoodItems] = useState([]);
-  const [foodOptions, setFoodOptions] = useState([]);
-  const [showNewFoodModal, setShowFoodModal] = useState(false);
-  const [foodModalData, setFoodModalData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const {register, handleSubmit, errors} = useForm();
+
   const [picture, setPicture] = useState(null);
   const [isPictureLoading, setIsPictureLoading] = useState(false);
-  const [measurements, setMeasurements] = useState([]);
-  const [measurementOptions, setMeasurementOptions] = useState([]);
 
-  const resetMeasurementOptions = (m) => {
-    let newMeasurementOptions = [];
-    if (!m) {
-      setMeasurementOptions([]);
-      return;
+  //const [foodItems, setFoodItems] = useState([]);
+  const [shouldShowPrompt, setShouldShowPrompt] = useState(false);
+  //const [totalCalories, setTotalCalories] = useState("");
+  const [instructionsText, setInstructionsText] = useState({ text: '' } );
+  const [foodItemSections, setFoodItemSections] = useState([
+    {
+      id: uuidv4(),
+      name: "For the Dough",
+      totalCalories: 0,
+      foodItems: []
+    },
+    {
+      id: uuidv4(),
+      name: "For the Cinnamon Filling",
+      totalCalories: 0,
+      foodItems: []
     }
-    m.forEach(mItem => {
-      newMeasurementOptions.push(
-        { value: mItem.id,
-          label: mItem.name,
-          color: '#00B8D9',
-          isFixed: true },
-      )
-    });
-    setMeasurementOptions(newMeasurementOptions);
-  };
-  
+  ]);
+  const { data:foods} = useSWR("/api/food", fetcher);
 
-  const resetFoodOptions = (foodItems) => {
-    if (!foodItems) {
-      setFoodOptions([]);
-      return;
-    }
-    let newFoodOptions = [];
-    foodItems.forEach(foodItem => {
-      newFoodOptions.push(
-        { value: foodItem.id,
-          label: foodItem.servingSize + " - " + foodItem.description,
-          color: '#00B8D9',
-          isFixed: true },
-      )
-    });
-    setFoodOptions(newFoodOptions);
-  };
-  
-  const mapOptionsToValues = options => {
-    return options.map(foodItem=> ({
-      value: foodItem.id,
-      label: foodItem.servingSize + " - " + foodItem.description
-    }));
-  };
-
-  const promiseOptions = (inputValue, callback) => {
-    if (!inputValue) {
-      return callback([]);
-    }
-
-    FoodService.getFilteredFoods(inputValue).then(
-      (response) => {
-        setFoodItems(response.data);
-        //resetFoodOptions(response.data);
-        callback(mapOptionsToValues(response.data));
-        setIsLoading(false);
-      },
-      (error) => {
-        alert(JSON.stringify(error));
-        setIsLoading(false);
-      }
-    );
-  };
 
   const onSubmit = data => {
-    console.log("data: " + JSON.stringify(data));
     console.log("picture: " + picture);
-    
-    if (recipeItems.length === 0) {
-      alert("You must add at least one ingredient");
-      return;
-    }
-    
-    let recipe = {
-      name: data.name,
-      servings: data.servings,
-      imageId: picture ? picture.id : null,
-      recipeItems: []
-    };
-    
-    for (let i = 0; i < recipeItems.length; i++) {
-      let recipeItem = recipeItems[i];
-      if (!recipeItem.foodItem || !recipeItem.foodItem.id) {
-        alert("Each ingredient must have a description selected");
-        return;
-      }
-      
-      if (recipeItem.servings <= 0) {
-        alert("Each of the ingredient servings must be greater than 0");
-        return;
-      }
-      
-      recipe.recipeItems.push({
-        foodItemId: recipeItem.foodItem.id,
-        servings: recipeItem.servings,
-        comments: data[`comment-${recipeItem.recipeItemId}`]
-      });
-    }
-    
-    console.log(JSON.stringify(recipe));
-    alert("post this data: " + JSON.stringify(recipe));
-    
-    RecipeService.addRecipe(recipe).then(
-      (response) => {
-        alert("Posted successfully, response is: " + JSON.stringify(response.data));
-        reset()
-      },
-      (error) => {
-        console.log(JSON.stringify(error));
-        alert(JSON.stringify(error));
-      }
-    );
-  };
-  
-  const setFoodSelection = (selectedFoodOption, recipeItemId, selectedFood) => {
-
-    console.group("setFoodSelection");
-    let newRecipeItems = [];
-
-    for (let i = 0; i < recipeItems.length; i++) {
-      let recipeItem = recipeItems[i];
-      let recipeItemCopy = JSON.parse(JSON.stringify(recipeItem));
-     
-      if (recipeItemCopy.recipeItemId === recipeItemId) {
-        console.log("Changing label and value to: " + JSON.stringify(selectedFoodOption));
-        recipeItemCopy.value = {
-          label: selectedFoodOption.label,
-          value: selectedFoodOption.value
-        };
-        if (selectedFood) {
-          recipeItemCopy.foodItem = {...selectedFood};
-          console.log("recalculating calories");
-          console.log("recipeItemCopy.foodItem.calories: " + recipeItemCopy.foodItem.calories);
-          console.log("recipeItemCopy.serving: " + recipeItemCopy.servings);
-          recipeItemCopy.calories = recipeItemCopy.foodItem.calories * recipeItemCopy.servings;
-        } else {
-          recipeItemCopy.calories = 0;
-          recipeItemCopy.foodItem = {}
-        }
-      }
-      newRecipeItems.push(recipeItemCopy);
-    }
-    
-    setRecipeItems(newRecipeItems);
-    console.groupEnd();
-  };
-
-  const handleFoodChanged = (selectedFoodOption, actionMeta, recipeItemId) => {
-    // the selectedFoodOption.value is the food id
-    let foodItem = findFoodItem(selectedFoodOption.value);
-    let newFoodItem = {...foodItem};
-    setFoodSelection(selectedFoodOption, recipeItemId, newFoodItem);
-  };
-
-  const handleMeasurementChanged = (selectedMeasurementOption, actionMetadata, recipeItemId) => {
-    console.log("handleMeasurementChanged: " + JSON.stringify(selectedMeasurementOption, null, 2));
-  };
-  
-  const handleCreateNewFoodItem = (partialDescriptionInputValue, recipeItemId) => {
-    setIsLoading(true);
-    
-    setFoodModalData({
-      description: partialDescriptionInputValue,
-      servingSize: "",
-      calories: 0,
-      recipeItemId: recipeItemId
-    });
-    setShowFoodModal(true);
-  };
-
-  const handleSaveNewFoodItem = (data) => {
-    setShowFoodModal(false);
-
-    let foodItemRequestPayload = {
-      description: data.description,
-      servingSize: data.servingSize,
-      calories: data.calories
-    };
-    FoodService.addFood(foodItemRequestPayload).then(
-      (response) => {
-        console.log("Posted successfully, response is: " + JSON.stringify(response.data));
-        let newFoodItem = response.data;
-        const newFoodOption = { value: newFoodItem.id,
-            label: newFoodItem.servingSize + " - " + newFoodItem.description,
-            color: '#00B8D9',
-            isFixed: true };
-        setIsLoading(false);
-        setFoodOptions([...foodOptions, newFoodOption]);
-        addFoodItem(newFoodItem);
-        setFoodSelection(newFoodOption, data.recipeItemId, newFoodItem);
-      },
-      (error) => {
-        console.log(JSON.stringify(error));
-        alert(JSON.stringify(error));
-        setIsLoading(false);
-      }
-    );
-    
-  };
-  
-  const fetchAllFoods = () => {
-    FoodService.getAllFoods().then(
-      (response) => {
-        console.log(JSON.stringify(response.data, null, 2));
-        setFoodItems(response.data);
-        resetFoodOptions(response.data);
-        setIsLoading(false);
-      },
-      (error) => {
-        alert(JSON.stringify(error));
-        setIsLoading(false);
-      }
-    );
-
-
-  };
-
-  useEffect(() => {
-    fetchAllFoods();
-    MeasurementService.getAllMeasurements().then(
-      (response) => {
-        console.log("Got measurements");
-       // console.log(JSON.stringify(response.data, null,2));
-        setMeasurements(response.data);
-        resetMeasurementOptions(response.data);
-      },
-      (error) => {
-        console.log("******ERROR: " + JSON.stringify(error.response));
-        alert(JSON.stringify(error.response));
-      });
-  }, []);
-  
-  const handleAddRow = event => {
-    event.preventDefault();
-    let newRecipeItems = [];
-    recipeItems.forEach(item => {
-      let newItem = JSON.parse(JSON.stringify(item));
-      newRecipeItems.push(newItem);
-    });
-    let newRecipeItemId =  uuidv4();
-    newRecipeItems.push({
-      servings: 1,
-      calories: 0,
-      recipeItemId: newRecipeItemId,
-      comment: "",
-      foodItem: {}
-    });
-    setRecipeItems(newRecipeItems);
-  };
-  
-
-  const handleRowServingsUpdate = (recipeItemId, servings) => {
-    let newRecipeItems = [];
-    recipeItems.forEach(item => {
-      let newItem = JSON.parse(JSON.stringify(item));
-      if (recipeItemId === newItem.recipeItemId) {
-        newItem.servings = servings;
-        if (newItem.foodItem) {
-          newItem.calories = newItem.foodItem.calories * newItem.servings;
-        } else {
-          newItem.calories = 0;
-        }
-      }
-      newRecipeItems.push(newItem);
-    });
-    setRecipeItems(newRecipeItems);
-  };
-
-  const deleteRecipeItemAction = (event, recipeItemId) => {
-    let newRecipeItems = [];
-    recipeItems.forEach(recipeItem => {
-      if (recipeItem.recipeItemId !== recipeItemId) {
-        let recipItemCopy = JSON.parse(JSON.stringify(recipeItem));
-        newRecipeItems.push(recipItemCopy);
-      }
-    });
-    setRecipeItems(newRecipeItems);
-  };
-  
-
-  
-  const findFoodItem = (foodId) => {
-    for (let i = 0; i < foodItems.length; i++) {
-      let foodItem = foodItems[i];
-      if (foodId === foodItem.id) {
-        return foodItem;
-      }
-    }
-    return null;
-  };
-  
-  const handleServingsOnBlur = (event, recipeItemId) => {
-    handleRowServingsUpdate(recipeItemId, event.target.value);
-  };
-  
-  
-  const handleCloseNewFoodModal = () => {
-    setIsLoading(false);
-    setShowFoodModal(false);
-  };
-
-  const addFoodItem = newFoodItem => {
-    let newFoodItems = [];
-    foodItems.forEach(foodItem => {
-      let newFoodItem = JSON.parse(JSON.stringify(foodItem));
-      newFoodItems.push(newFoodItem);
-    });
-    newFoodItems.push(newFoodItem);
-    setFoodItems(newFoodItems);
-  };
-  
-  const asyncSelect = (row) => {
-    return       <AsyncCreatableSelect
-      isDisabled={isLoading}
-      isLoading={isLoading}
-      onChange={(value, actionMetadata) => handleFoodChanged(value, actionMetadata, row.recipeItemId)}
-      onCreateOption={value => handleCreateNewFoodItem(value, row.recipeItemId )}
-      options={foodOptions}
-      value={row.value}
-      defaultOptions
-      loadOptions={promiseOptions}
-    />
   };
 
   const onImageFileChange = e => {
@@ -372,12 +115,6 @@ const AddRecipe = (props) => {
       alert("Wrong file type for image!");
       return;
     }
-    // let reader = new FileReader();
-    // reader.onload = function(event) {
-    //   setPicture(event.target.result);
-    //   console.log(event.target.result);
-    // };
-    // reader.readAsDataURL(file);
     setIsPictureLoading(true);
     ImageService.uploadImage(file).then(
       (response) => {
@@ -393,34 +130,297 @@ const AddRecipe = (props) => {
     );
   };
 
-  const findMeasurementOption = (value) => {
-    console.log("findMeasurementOption, value: " + JSON.stringify(value, null, 2));
-    console.log("*** measurementOptions: " + JSON.stringify(measurementOptions));
-    let foundOption = {};
-    for (let i = 0; i < measurementOptions.length; i++) {
-      let currentOption = measurementOptions[i];
-     // console.log("currentOption: " + JSON.stringify(currentOption, null, 2));
-      if (currentOption.value === value) {
-        foundOption = {...currentOption};
-        break;
-      }
-    }
-    console.log("foundOption: " + JSON.stringify(foundOption, null, 2));
-    return foundOption;
-  };
   
   const removeImage = () => {
     setPicture(null);
   };
-  
+
+  const handleInstructionsTextChange = (value) => {
+    console.log("*** handleInstructionsTextChange, value: " + value);
+    setInstructionsText({text: value});
+  };
+
   const onError = () => {
     
   };
+
+  // useEffect(() => {
+  //   populateFoodItemsWithOptionalUpdate("none",[]);
+  // }, []);
+
+  const getAllowedUnitOptionsForFood = foodItem => {
+    return allCookingUnits.filter(unit => {
+      return (foodItem.grams && unit.measure === "mass") ||
+        (foodItem.volumeUnit && foodItem.volumeAmount && unit.measure === "volume") ||
+        ((foodItem.defaultUnit === "Serving" || !foodItem.defaultUnit) && unit.abbr === "Serving")
+    }).map(unit => {
+      return {...unit, value: unit.abbr, label: unit.singular}
+    })
+  };
+
+  const populateFoodOptions = (items) => {
+    if (!items || !Array.isArray(items)) {
+      return null;
+    }
+    let options = items.map(item => {
+      return {...item, value: item.id, label: item.description, allowedUnits: getAllowedUnitOptionsForFood(item)}
+    });
+    return options;
+  };
+
+  const copyFoodItem = (foodItem) => {
+    let newFoodItem = {
+      foodItemId: foodItem.foodItemId,
+      amount: foodItem.amount,
+      unit: {...(foodItem.unit)},
+      food: {...(foodItem.food)},
+      comment: foodItem.comment
+    };
+    return newFoodItem;
+  };
+
+  const copyFoodItemWithUpdate = (foodItem, accessor, value) => {
+    return {
+      foodItemId: foodItem.foodItemId,
+      amount: (accessor === "amount") ? value : foodItem.amount,
+      unit: (accessor === "unit") ? {...value} : {...(foodItem.unit)},
+      food: (accessor === "food") ? {...value} : {...(foodItem.food)},
+      comment: (accessor === "comment") ? value : foodItem.comment
+    }
+  };
+
+  const validateFoodItem = (foodItem) => {
+    let error = {};
+    error.amount = CaloriesConverter.validateAmount(foodItem.amount);
+    return error;
+  };
+
+  const findUnit = (unit, unitList) => {
+    if (!unitList || !unit) {
+      return null;
+    }
+    for (let i = 0; i < unitList.length; i++) {
+      let currentUnit = unitList[i];
+      if (currentUnit.value === unit.value) {
+        return currentUnit;
+      }
+    }
+    return null;
+  };
+
+  const createNewFoodItem = () => {
+    let newFoodItem = copyFoodItem(genericFoodItem);
+    newFoodItem.foodItemId =  uuidv4();
+    newFoodItem.error = {};
+    return newFoodItem;
+  };
+
+  const findUnitOption = (abbr) => {
+    return allCookingUnits.find(unit => unit.abbr === abbr)
+  };
+
+  const populateFoodItemsWithOptionalUpdate = (action, foodSection, payload) => {
+    if (action === "update" || action === "delete" || action === "add") {
+      setShouldShowPrompt(true);
+    }
+    let items = foodSection.foodItems;
+    let newFoodItems = [];
+    let newTotalCalories = 0;
+    for (let i = 0; i < items.length; i++) {
+      let foodItem = items[i];
+      let newFoodItem = null;
+      if ( (action === "update" || action === "delete") && (payload.foodItemId === foodItem.foodItemId)) {
+        if (action === "delete") {
+          continue;
+        }
+
+        newFoodItem = copyFoodItemWithUpdate(foodItem, payload.accessor, payload.value);
+
+        if (!findUnit(newFoodItem.unit, newFoodItem.food.allowedUnits)) {
+          newFoodItem.unit = findUnitOption(newFoodItem.food.defaultUnit);
+          if (!newFoodItem.unit) {
+            newFoodItem.unit = newFoodItem.food.allowedUnits.length > 0 ? newFoodItem.food.allowedUnits[0] : {};
+          }
+        }
+      } else {
+        newFoodItem = copyFoodItem(foodItem);
+      }
+      if (newFoodItem.food.value === "Generic") {
+        newFoodItem.calories = "";
+      } else {
+        newFoodItem.calories = CaloriesConverter.calcCalories(newFoodItem.amount, newFoodItem.unit, newFoodItem.food);
+        if (isNaN(newFoodItem.calories)) {
+          console.log("error calculation calories: " + newFoodItem.calories);
+          newFoodItem.calories = "";
+        }
+      }
+      let newCalories = 0;
+      try {
+        newCalories = parseInt(newFoodItem.calories);
+        if (isNaN(newCalories)) {
+          newCalories = 0;
+        }
+      } catch (ex) {
+
+      }
+      newTotalCalories += newCalories;
+      newFoodItem.error = validateFoodItem(newFoodItem);
+      newFoodItems.push(newFoodItem);
+    };
+    if (action === "add") {
+      newFoodItems.push(createNewFoodItem());
+    }
+    foodSection.foodItems = newFoodItems;
+    foodSection.totalCalories = newTotalCalories;
+    return foodSection;
+    
+    // setFoodItems(newFoodItems);
+    // setTotalCalories(newTotalCalories);
+  };
+  
+  const findFoodItemSection = (sectionId) => {
+    return foodItemSections.find(section => 
+      section.id === sectionId
+    )
+  };
+  
+  const handleModifySection = (accessor, value, foodItemId, sectionId, payload) => {
+    const originalFoodItemSection = findFoodItemSection(sectionId);
+    console.log("originalFoodItemSection: " + JSON.stringify(originalFoodItemSection, null, 2));
+    let updatedFoodItemSection = populateFoodItemsWithOptionalUpdate(accessor, originalFoodItemSection, payload);
+    console.log("updatedFoodItemSection: " + JSON.stringify(updatedFoodItemSection, null, 2))
+    let newFoodItemSections = [];
+    // try shallow copy 
+    
+    for (let i = 0; i < foodItemSections.length; i++) {
+      let foodItemSection = foodItemSections[i];
+      console.log("i: " + i + ",  foodItemSection: " +JSON.stringify(foodItemSection, null, 2));
+      console.log("i: " + i + ",  newFoodItemSections: " +JSON.stringify(newFoodItemSections, null, 2));
+      if (foodItemSection.id === sectionId) {
+        newFoodItemSections.push(updatedFoodItemSection);
+      } else {
+        newFoodItemSections.push(foodItemSection)
+      }
+    }
+    console.log("newFoodItemSections: " + JSON.stringify(newFoodItemSections, null, 2))
+    setFoodItemSections(newFoodItemSections);
+  };
+
+  const handleUpdateFoodItem = (accessor, value, foodItemId, sectionId) => {
+    console.log("handleUpdateFoodItem, sectionId: " + sectionId);
+    handleModifySection("update", value, foodItemId, sectionId, {foodItemId, accessor, value});
+   
+  };
+
+  const handleAddFoodItem = (sectionId) => {
+    console.log("handleAddFoodItem, sectionId: " + sectionId);
+    handleModifySection("add", null, null, sectionId);
+  };
+
+  const handleDeleteFoodItem = (foodItemId, sectionId) => {
+    console.log("handleDeleteFoodItem, sectionId: " + sectionId);
+    handleModifySection("delete", null, foodItemId, sectionId, {foodItemId: foodItemId});
+  };
+
+  const CellInput = (props) => {
+    const [value, setValue] = useState("");
+    
+    useEffect(() => {
+      setValue(props.value)
+    }, [props]);
+
+    const handleInputChanged = (event) => {
+      setValue(event.target.value);
+    };
+
+    const handleOnBlur = (event) => {
+      props.onBlur(props.accessor, event.target.value.trim(), props.foodItemId, props.sectionId)
+    };
+
+    return (
+      <input value={value}
+             onChange={event => handleInputChanged(event)}
+             onBlur={event => handleOnBlur(event)}
+             className="form-control"
+             style={{fontSize: "12px"}}
+             
+      />
+    )
+  };
+  const editableFoodGroupingSelectStyles = {
+    singleValue: (provided, state) => ({
+      ...provided,
+      whiteSpace: "normal",
+      fontSize: "12px",
+      height: "22px",
+      paddingBottom: "14px",
+      paddingTop: "0px"
+
+    }),
+    menu: (provided, state) => (
+      {
+        ...provided,
+        width: "100%",
+        height: "30px",
+        padding: "0px"
+      }
+    ),
+    menuList: (provided, state) => (
+      {
+        ...provided,
+        backgroundColor: "white"
+      }
+    ),
+    control: (provided, state) => (
+      {
+        ...provided,
+        height: "12px",
+        padding: "2px",
+        minHeight: "32px",
+
+      }
+    ),
+    valueContainer: (provided, state) => (
+      {
+        ...provided,
+        padding: "0px"
+      }
+    ),
+    indicatorsContainer: (provided, state) => (
+      {
+        ...provided,
+        height: "10px",
+        padding: "2px",
+        minHeight: "32px"
+      }
+    )
+  };
+
+  let unitWidth = "150px";
+  let commentWidth = "200px";
+  let foodWidth = "500px";
+
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, false] }],
+      ['bold', 'italic', 'underline','strike', 'blockquote'],
+      [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+      ['link', 'image'],
+      ['clean']
+    ],
+  };
+
+  const  formats = [
+      'header',
+      'bold', 'italic', 'underline', 'strike', 'blockquote',
+      'list', 'bullet', 'indent',
+      'link', 'image'
+    ];
   
   return (
     <div className="container">
       <div>
-        Add Recipe
+        <h1>Add Recipe</h1>
       </div>
 
       
@@ -460,106 +460,142 @@ const AddRecipe = (props) => {
           </div>
         </div>
 
-        <div className="form-group">
-          <label className="control-label col-sm-6" htmlFor="servings">Servings</label>
-          <div className="col-sm-6">
-            <input name="servings" type="number" step="0.001" min="0" ref={register({required: true})} className="form-control"/>
-            {_.get("servings.type", errors) === "required" && (
-              <p className="error">Servings is required</p>
-            )}
-          </div>
-        </div>
-
-       
         
+          <div className="form-group">
+            <label className="control-label col-sm-6" htmlFor="servings">Servings</label>
+            <div className="col-sm-6">
+              <input name="servings" type="number" step="0.001" min="0" ref={register({required: true})}
+                     className="form-control"/>
+              {_.get("servings.type", errors) === "required" && (
+                <p className="error">Servings is required</p>
+              )}
+            </div>
+          </div>
 
         <div className="form-group">
           <div className="col-sm-10">
-        <Table size="sm" >
-          <thead>
-      
-            <tr>
-              <th style={{width: recipeCellWidths.SERVINGS, border: "hidden"}}>Ingredients</th>
-              <th style={{width: "150px", border: "hidden"}}></th>
-              <th style={{width: recipeCellWidths.COMMENT, border: "hidden"}}></th>
-              <th style={{width: recipeCellWidths.CALORIES, border: "hidden"}}></th>
-              <th style={{width: recipeCellWidths.DELETE, border: "hidden"}}>
-                <button style={{backgroundColor: '#00548F'}} className="btn btn-primary btn-block btn-secondary btn-sm"
-                onClick={event => handleAddRow(event)}>
-                  Add
-                </button>
-              </th>
-            </tr>
-       
-          </thead>
-        </Table>
+            <h2>Ingredients</h2>
           </div>
-        </div>
-        
-        <div className="form-group" style={{paddingBottom: "20px"}}>
          
+          
+        </div>
+         
+        {foodItemSections.map(foodItemSection => 
+        <div className="form-group" >
+          <div className="col-sm-10" >
+            {foods ? (
+            <div style={{padding: "5px", border: "1px", borderColor: "#ced4da", borderStyle: "solid", borderRadius: ".25rem"}}>
+             
+              <h3>{foodItemSection.name}</h3>
+            
+              <div style={{marginBottom: "10px"}}>
+                <Button onClick = {event => handleAddFoodItem(foodItemSection.id)} style={{backgroundColor: '#00548F'}}>
+                  Add Ingredient
+                </Button>
+              </div>
+
+              <table style={{maxWidth: "900px"}}>
+                <thead>
+                <tr><th style={{width: "100px"}}>Amount</th>
+                  <th style={{width: unitWidth}}>Unit</th>
+                  <th style={{width: foodWidth }}>Food</th>
+                  <th style={{width: commentWidth}}>Comment</th>
+                  <th style={{width: "100px"}}>Calories</th>
+                  <th>Delete</th></tr>
+                </thead>
+
+                <tbody>
+                {
+                  foodItemSection.foodItems && foodItemSection.foodItems.map(row => {
+                    return (
+                      <tr key={row.foodItemId}>
+                        <td style={{verticalAlign: "top", width: "100px"}}>
+                          <CellInput
+                            value = {row.amount}
+                            onBlur = {handleUpdateFoodItem}
+                            accessor = "amount"
+                            foodItemId = {row.foodItemId}
+                            sectionId = {foodItemSection.id}
+                          />
+                          {
+                            row.error && row.error.amount && <p style={{fontSize: "12px", fontWeight: "bold", color: "red"}}>{row.error.amount}</p>
+                          }
+                        </td>
+                        <td style={{verticalAlign: "top", width: unitWidth}}>
+
+                          <Select
+                            options = {row.food.allowedUnits}
+                            onChange = {(value, actionMetadata) => handleUpdateFoodItem("unit", value, row.foodItemId, foodItemSection.id)}
+                            value={row.unit}
+                            styles={editableFoodGroupingSelectStyles}
+
+                          />
+                        </td>
+                        <td style={{verticalAlign: "top", width: foodWidth }} >
+
+                          <Select
+                            options = {populateFoodOptions(foods)}
+                            onChange = {(value, actionMetadata) => handleUpdateFoodItem("food", value, row.foodItemId, foodItemSection.id)}
+                            value={row.food}
+                            styles={editableFoodGroupingSelectStyles}
+
+
+                          />
+
+                        </td>
+                        <td style={{verticalAlign: "top", width: commentWidth}}>
+                          <CellInput
+                            value = {row.comment ? row.comment : ""}
+                            onBlur = {handleUpdateFoodItem}
+                            accessor = "comment"
+                            foodItemId = {row.foodItemId}
+                            sectionId = {foodItemSection.id}
+                          />
+                          {
+                            row.error && row.error.amount && <p style={{fontSize: "12px", fontWeight: "bold", color: "red"}}>{row.error.comment}</p>
+                          }
+                        </td>
+                        <td>
+                          <div style={{ textAlign: "right", width: "100px", fontSize: "12px", paddingRight: "30px"}}>{row.calories}</div>
+                        </td>
+                        <td style={{ width: "100px" }}>
+                          <IconButton onClick={event=> {handleDeleteFoodItem(row.foodItemId, foodItemSection.id)}} style = {{padding: "0px"}}>
+                            <DeleteForeverIcon/>
+                          </IconButton>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                <tr><td style={{width: "100px"}}></td>
+                  <td style={{width: unitWidth}}></td>
+                  <td style={{width: foodWidth }}></td>
+                  <td style={{width: commentWidth, fontWeight: "bold", textAlign: "right", fontSize: "12px", height: "32px", paddingTop: "10px"}}>Total Calories</td>
+                  <td style={{width: "100px", textAlign: "right", fontSize: "12px", paddingRight: "30px", height: "32px", paddingTop: "10px"}}>{foodItemSection.totalCalories}</td>
+                  <td></td></tr>
+                </tbody>
+              </table>
+
+              <Prompt when={shouldShowPrompt} message="You have unsaved changes, are you sure you want to leave?"/>
+
+            </div>
+
+            ) : <div>Loading</div>}
+           
+          </div>
+          
+         
+        </div>
+        )}
+
+        <div className="form-group">
           <div className="col-sm-10">
-            <Table size="sm">
-              <thead>
-              <tr>
-                <th style={{width: recipeCellWidths.SERVINGS}}>Servings</th>
-                <th style={{width: "150px"}}>Unit</th>
-                <th style={{width: "150px"}}>Description</th>
-                <th style={{width: recipeCellWidths.COMMENT}}>Comment</th>
-                <th style={{width: recipeCellWidths.CALORIES}}>Calories</th>
-                <th style={{width: recipeCellWidths.DELETE}}>Delete</th>
-              </tr>
-              </thead>
-              <tbody>
-              {recipeItems && (recipeItems.map((row, index) => 
-                (<tr key={row.recipeItemId}>
-                  <td>
-                    <input name={"servings-" + row.recipeItemId} type="number" step="0.001" min="0" ref={register({required: true})} className="form-control" 
-                           defaultValue={row.servings}
-                    onBlur={event => handleServingsOnBlur(event, row.recipeItemId)}/>
-                  </td>
-                  <td>
-                    <Select
-                      options={measurementOptions}
-                      onChange={(value, actionMetadata) => handleMeasurementChanged(value, actionMetadata, row.recipeItemId)}
-                    />
-                  </td>
-                  <td>
-                    <CreatableSelect
-                      isDisabled={isLoading}
-                      isLoading={isLoading}
-                      onChange={(value, actionMetadata) => handleFoodChanged(value, actionMetadata, row.recipeItemId)}
-                      onCreateOption={value => handleCreateNewFoodItem(value, row.recipeItemId )}
-                      options={foodOptions}
-                      value={row.value}
-                    />
-                  </td>
-                  <td>
-                    <textarea name={"comment-" + row.recipeItemId}  ref={register({required: false})} className="form-control"
-                           defaultValue={row.comment} rows="1"></textarea>
-                  </td>
-                  <td style={{textAlign: "right"}}>
-                    <span>{row.calories}</span>
-                  </td>
-                  <td style={{textAlign: "right"}}>
-                    <Tooltip title="Delete entry">
-                      <IconButton
-                        aria-label="delete"
-                        className={classes.iconButton}
-                        id={row.id}
-                        onClick={event => deleteRecipeItemAction(event, row.recipeItemId)}
-                      >
-                        <DeleteIcon/>
-                      </IconButton>
-                    </Tooltip>
-                  </td>
-                </tr>)
-              )) }
-              </tbody>
-            </Table>
+            <h2>Instructions</h2>
+            <ReactQuill value={instructionsText.text}
+                        onChange={handleInstructionsTextChange}
+                        modules={modules}
+                        format={formats}/>
           </div>
         </div>
-        
         
         <div className="form-group">
           <div className="col-sm-2">
@@ -568,11 +604,7 @@ const AddRecipe = (props) => {
         </div>
        
       </form>
-    <NewFoodFormModal show={showNewFoodModal} 
-                      handleClose={handleCloseNewFoodModal}
-                      handleSave={handleSaveNewFoodItem}
-                      data={foodModalData}
-    />
+      
 
     </div>
   );
