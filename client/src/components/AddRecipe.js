@@ -2,22 +2,30 @@ import React, {useState, useEffect} from "react";
 import { Prompt } from 'react-router';
 
 import {useForm} from "react-hook-form";
+
 import Spinner from 'react-bootstrap/Spinner'
+
 import _ from "lodash/fp";
 
-import ImageService from "../services/image.service";
-import Image from './Image'
-import CaloriesConverter from "../utils/calories.converter.util";
 import axios from "axios";
-import authHeader from "../services/auth-header";
+
 import useSWR from "swr";
+
 import {v4 as uuidv4} from "uuid";
+
 import Button from "react-bootstrap/Button";
+
 import Select from "react-select";
+
 import IconButton from "@material-ui/core/IconButton";
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 
 import ReactQuill from 'react-quill';
+
+import ImageService from "../services/image.service";
+import Image from './Image'
+import CaloriesConverter from "../utils/calories.converter.util";
+import authHeader from "../services/auth-header";
 
 
 
@@ -284,42 +292,41 @@ const AddRecipe = (props) => {
     )
   };
   
-  const handleModifySection = (accessor, value, foodItemId, sectionId, payload) => {
-    const originalFoodItemSection = findFoodItemSection(sectionId);
-    console.log("originalFoodItemSection: " + JSON.stringify(originalFoodItemSection, null, 2));
-    let updatedFoodItemSection = populateFoodItemsWithOptionalUpdate(accessor, originalFoodItemSection, payload);
-    console.log("updatedFoodItemSection: " + JSON.stringify(updatedFoodItemSection, null, 2))
+  const updateFoodItemSection = (updatedFoodItemSection) => {
     let newFoodItemSections = [];
     // try shallow copy 
-    
+
     for (let i = 0; i < foodItemSections.length; i++) {
       let foodItemSection = foodItemSections[i];
-      console.log("i: " + i + ",  foodItemSection: " +JSON.stringify(foodItemSection, null, 2));
-      console.log("i: " + i + ",  newFoodItemSections: " +JSON.stringify(newFoodItemSections, null, 2));
-      if (foodItemSection.id === sectionId) {
+      if (foodItemSection.id === updatedFoodItemSection.sectionId) {
         newFoodItemSections.push(updatedFoodItemSection);
       } else {
         newFoodItemSections.push(foodItemSection)
       }
     }
-    console.log("newFoodItemSections: " + JSON.stringify(newFoodItemSections, null, 2))
     setFoodItemSections(newFoodItemSections);
+  };
+  
+  const updateFoodItemInSection = (accessor, value, foodItemId, sectionId, payload) => {
+    const originalFoodItemSection = findFoodItemSection(sectionId);
+    let updatedFoodItemSection = populateFoodItemsWithOptionalUpdate(accessor, originalFoodItemSection, payload);
+    updateFoodItemSection(updatedFoodItemSection);
   };
 
   const handleUpdateFoodItem = (accessor, value, foodItemId, sectionId) => {
     console.log("handleUpdateFoodItem, sectionId: " + sectionId);
-    handleModifySection("update", value, foodItemId, sectionId, {foodItemId, accessor, value});
+    updateFoodItemInSection("update", value, foodItemId, sectionId, {foodItemId, accessor, value});
    
   };
 
   const handleAddFoodItem = (sectionId) => {
     console.log("handleAddFoodItem, sectionId: " + sectionId);
-    handleModifySection("add", null, null, sectionId);
+    updateFoodItemInSection("add", null, null, sectionId);
   };
 
   const handleDeleteFoodItem = (foodItemId, sectionId) => {
     console.log("handleDeleteFoodItem, sectionId: " + sectionId);
-    handleModifySection("delete", null, foodItemId, sectionId, {foodItemId: foodItemId});
+    updateFoodItemInSection("delete", null, foodItemId, sectionId, {foodItemId: foodItemId});
   };
 
   const CellInput = (props) => {
@@ -347,6 +354,42 @@ const AddRecipe = (props) => {
       />
     )
   };
+  
+  const handleUpdateSectionName = (name, sectionId) => {
+    console.log("Update name for secection id " + sectionId + " to " + name);
+    let foodItemSection = findFoodItemSection(sectionId);
+    foodItemSection.name = name;
+    updateFoodItemSection(foodItemSection);
+  };
+  
+
+  const SectionNameInput = (props) => {
+    const [value, setValue] = useState("");
+
+    useEffect(() => {
+      setValue(props.value)
+    }, [props]);
+
+    const handleInputChanged = (event) => {
+      setValue(event.target.value);
+    };
+
+    const handleOnBlur = (event) => {
+      props.onBlur(event.target.value.trim(), props.sectionId)
+    };
+
+    return (
+      
+      <input value={value}
+             onChange={event => handleInputChanged(event)}
+             onBlur={event => handleOnBlur(event)}
+             style={{padding: "5px", border: "1px", borderColor: "#ced4da", borderStyle: "solid", borderRadius: ".25rem"}}
+             placeholder="Optional: Ingredient Section Name"
+      />
+      
+    )
+  };
+  
   const editableFoodGroupingSelectStyles = {
     singleValue: (provided, state) => ({
       ...provided,
@@ -425,6 +468,13 @@ const AddRecipe = (props) => {
 
       
       <div className="form-group">
+
+        <div className="form-group">
+          <div className="col-sm-10">
+            <h2>Basic Recipe Information</h2>
+          </div>
+        </div>
+        
         <label className="control-label col-sm-6" htmlFor="name">Recipe Image</label>
         <div className="col-sm-6">
           { isPictureLoading ? (<span><Spinner animation="border" role="status">
@@ -476,8 +526,6 @@ const AddRecipe = (props) => {
           <div className="col-sm-10">
             <h2>Ingredients</h2>
           </div>
-         
-          
         </div>
          
         {foodItemSections.map(foodItemSection => 
@@ -486,7 +534,13 @@ const AddRecipe = (props) => {
             {foods ? (
             <div style={{padding: "5px", border: "1px", borderColor: "#ced4da", borderStyle: "solid", borderRadius: ".25rem"}}>
              
-              <h3>{foodItemSection.name}</h3>
+              <h3>
+              <SectionNameInput  
+                value = {foodItemSection.name}
+                onBlur = {handleUpdateSectionName}
+                sectionId = {foodItemSection.id}
+              />
+              </h3>
             
               <div style={{marginBottom: "10px"}}>
                 <Button onClick = {event => handleAddFoodItem(foodItemSection.id)} style={{backgroundColor: '#00548F'}}>
