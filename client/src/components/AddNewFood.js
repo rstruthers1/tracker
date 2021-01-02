@@ -17,16 +17,7 @@ const AddNewFood = (props) => {
 
   useEffect(() => {
 
-    MeasurementService.getAllMeasurements().then(
-      (response) => {
-        console.log("Got measurements");
-        setMeasurements(response.data);
-        resetMeasurementOptions(response.data);
-      },
-      (error) => {
-        console.log("******ERROR: " + JSON.stringify(error.response));
-        alert(JSON.stringify(error.response));
-      });
+   
     
   }, []);
 

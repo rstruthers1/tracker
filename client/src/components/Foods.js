@@ -27,7 +27,6 @@ import FoodDelete from "./FoodDelete";
 import FoodEdit from "./FoodEdit";
 
 import FoodService from "../services/food.service";
-import MeasurementService from "../services/measurement-unit";
 
 const Foods = (props) => {
 
@@ -58,16 +57,6 @@ const Foods = (props) => {
         alert(JSON.stringify(error.response));
       });
 
-    MeasurementService.getAllMeasurements().then(
-      (response) => {
-        console.log("Got measurements");
-        setMeasurements(response.data);
-       // resetMeasurementOptions(response.data);
-      },
-      (error) => {
-        console.log("******ERROR: " + JSON.stringify(error.response));
-        alert(JSON.stringify(error.response));
-      });
   }, [fetchFoodTrigger]);
   
   const triggerFetchFoods = () => {

@@ -6,9 +6,7 @@ import useSWR, { SWRConfig } from 'swr'
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
-
 import AuthService from "./services/auth.service";
-
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Home from "./components/Home";
@@ -21,9 +19,6 @@ import Recipes from "./components/Recipes";
 import WakeUp from './components/WakeUp';
 import WakeUpService from './services/wakeup.service';
 import Foods from "./components/Foods";
-import EditableFoodGrouping from "./components/EditableFoodGrouping";
-
-
 
 
 const App = () => {
@@ -119,13 +114,6 @@ const App = () => {
               </Link>
             </li>
           )}
-          {currentUser && (
-            <li className="nav-item">
-              <Link to={"/efg"} className="nav-link">
-                EFG
-              </Link>
-            </li>
-          )}
         </div>
         {currentUser ? (
           <div className="navbar-nav ml-auto">
@@ -170,7 +158,6 @@ const App = () => {
           <Route path="/addRecipe" component={AddRecipe}/>
           <Route path="/recipes" component={Recipes}/>
           <Route path="/foods" component={Foods}/>
-          <Route path="/efg" component={EditableFoodGrouping}/>
         </Switch>
       </div>
     </div>

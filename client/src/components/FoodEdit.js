@@ -4,38 +4,15 @@ import React, {useState, useEffect} from "react";
 import {Controller, useForm} from "react-hook-form";
 import _ from "lodash/fp";
 import Select from "react-select";
-import FoodService from "../services/food.service";
-import MeasurementService from "../services/measurement-unit";
 
 const FoodEdit = (props) => {
   const { register, handleSubmit, reset, errors, control } = useForm();
-  const [measurementOptions, setMeasurementOptions] = useState([]);
-
-  const resetMeasurementOptions = (m) => {
-    let newMeasurementOptions = [];
-    if (!m) {
-      setMeasurementOptions([]);
-      return;
-    }
-    m.forEach(mItem => {
-      newMeasurementOptions.push(
-        { value: mItem.id,
-          label: mItem.name,
-          color: '#00B8D9',
-          isFixed: true },
-      )
-    });
-    setMeasurementOptions(newMeasurementOptions);
-  };
-  
 
   let open = props.open;
   let handleCloseOk = props.handleCloseOk;
   let handleCloseCancel = props.handleCloseCancel;
   let food =  props.food ? {...props.food} : {};
-  
   let grams = null;
-  let numMeasurementUnits = null;
 
   useEffect(() => {
     
@@ -45,42 +22,10 @@ const FoodEdit = (props) => {
     if (grams && !isNaN(grams)) {
       food.grams = (Number(grams)).toFixed(3);
     }
-
-    numMeasurementUnits = food.numMeasurementUnits;
-    if (numMeasurementUnits && !isNaN(numMeasurementUnits)) {
-      food.numMeasurementUnits = (Number(numMeasurementUnits)).toFixed(3);
-    }
-
-    let measurements = props.measurements ? [...props.measurements] : [];
-    console.log("measurements: " + JSON.stringify(props.measurements));
     
-    
-    resetMeasurementOptions(measurements);
   }, [props]);
 
-
-  /**
-   * findMeasurementOption, value: 91
-   FoodEdit.js:64 *** measurementOptions: [{"value":71,"label":"Servings","color":"#00B8D9","isFixed":true},{"value":81,"label":"Teaspoons","color":"#00B8D9","isFixed":true},{"value":91,"label":"Tablespoons","color":"#00B8D9","isFixed":true},{"value":101,"label":"Cups","color":"#00B8D9","isFixed":true},{"value":111,"label":"Pieces","color":"#00B8D9","isFixed":true},{"value":121,"label":"Ounces","color":"#00B8D9","isFixed":true},{"value":131,"label":"Pounds","color":"#00B8D9","isFixed":true},{"value":141,"label":"Grams","color":"#00B8D9","isFixed":true},{"value":151,"label":"Kilograms","color":"#00B8D9","isFixed":true},{"value":161,"label":"Fluid ounces","color":"#00B8D9","isFixed":true},{"value":171,"label":"Milliliters","color":"#00B8D9","isFixed":true},{"value":181,"label":"Liters","color":"#00B8D9","isFixed":true},{"value":191,"label":"Pints","color":"#00B8D9","isFixed":true},{"value":201,"label":"Quarts","color":"#00B8D9","isFixed":true},{"value":211,"label":"Gallons","color":"#00B8D9","isFixed":true},{"value":221,"label":"Milligrams","color":"#00B8D9","isFixed":true},{"value":231,"label":"Micrograms","color":"#00B8D9","isFixed":true},{"value":241,"label":"Grams","color":"#00B8D9","isFixed":true}]
-
-   */
-  const findMeasurementOption = (value) => {
-    console.log("findMeasurementOption, value: " + JSON.stringify(value, null, 2));
-    console.log("*** measurementOptions: " + JSON.stringify(measurementOptions));
-    let foundOption = {};
-    for (let i = 0; i < measurementOptions.length; i++) {
-      let currentOption = measurementOptions[i];
-      console.log("currentOption: " + JSON.stringify(currentOption, null, 2));
-      if (currentOption.value == value) {
-        foundOption = {...currentOption};
-        break;
-      }
-    }
-    console.log("foundOption: " + JSON.stringify(foundOption, null, 2));
-    return foundOption;
-  };
-
-
+  
   const onSubmit = data => {
     console.log(JSON.stringify(data,null, 2));
     handleCloseOk(data);
@@ -138,10 +83,10 @@ const FoodEdit = (props) => {
                   <Controller
                     name="measurementUnit"
                     as={Select}
-                    options={measurementOptions}
+                    
                     control={control}
                     rules={{required: true}}
-                    defaultValue={findMeasurementOption(food.measurementUnitId) || ""}
+                    
                   />
                   {_.get("measurementUnit.type", errors) === "required" && (
                     <p className="error">Serving Size Unit is required</p>
