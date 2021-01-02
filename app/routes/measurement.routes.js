@@ -16,5 +16,11 @@ module.exports = function(app) {
     controller.addMeasurement
   );
 
+  app.get(
+    "/api/measurement",
+    [authJwt.verifyToken],
+    controller.getAllMeasurements
+  );
+
 
 };

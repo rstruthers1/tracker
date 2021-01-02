@@ -170,4 +170,101 @@ footer svg:hover, .delete svg:hover {
   }
 }
 
+input {display: block; padding: 0; margin: 0; border: 0; width: 100%;}
+td {margin: 0; padding: 0;}
+
+
+.recipeSectionOutline {
+  padding: 5px;
+  border: 1px dashed #ced4da;
+  border-radius: .25rem;
+}
+
+.recipeSectionTable {
+  maxWidth: 900px;
+  border: 1px dashed #ced4da;
+}
+
+.recipeSectionTableCellAmount {
+  width: 86px;
+  border: 1px dashed #ced4da;
+}
+
+.recipeSectionTableCellUnit {
+  width: 109px;
+  border: 1px dashed #ced4da;
+}
+
+.recipeSectionTableCellFood {
+  width: 335px;
+  border: 1px dashed #ced4da;
+}
+
+.recipeSectionTableCellComment {
+  width: 156px;
+  border: 1px dashed #ced4da;
+}
+
+.recipeSectionTableCellCommentFooter {
+  width: 156px;
+  font-weight: bold;
+  text-align: right;
+  font-size: 12px;
+  height: 32px;
+  padding-top: 10px;
+  border: 1px dashed #ced4da;
+}
+
+.recipeSectionTableCellCaloriesTh {
+  width: 88px;
+  border: 1px dashed #ced4da;
+}
+
+
+.recipeSectionTableCellCaloriesTd {
+  width: 88px;
+  text-align: right;
+  font-size: 12px;
+  height: 32px;
+  padding-right: 30px;
+  padding-top: 10px;
+  border: 1px dashed #ced4da;
+}
+
+.recipeSectionTableCellCaloriesFooterTd {
+  width: 88px;
+  text-align: right;
+  font-weight: bold;
+  font-size: 12px;
+  height: 32px;
+  padding-right: 30px;
+  padding-top: 10px;
+  border: 1px dashed #ced4da;
+}
+
+.recipeSectionTableCellDeleteTh {
+  width: 84px;
+  border: 1px dashed #ced4da;
+}
+
+.recipeSectionTableCellDeleteTd {
+  width: 84px;
+  text-align: center;
+  border: 1px dashed #ced4da;
+}
+
+.recipeSectionNameInput {
+  padding: 5px;
+  border: 1px dashed #ced4da;
+  border-radius: .25rem;
+}
+
+
+
+
+
+
+
+
+
 

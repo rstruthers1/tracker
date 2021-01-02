@@ -34,6 +34,8 @@ https://rms-tracker.herokuapp.com/
 * Used this for foods page: https://retool.com/blog/building-a-react-table-component/
 * Sandbox - pagination: https://codesandbox.io/s/github/tannerlinsley/react-table/tree/master/examples/pagination?file=/src/App.js:1984-2288
 * Use memo. Needed for performance reasons for react-table: https://reactjs.org/docs/hooks-reference.html#usememo
+* https://react-table.tanstack.com/docs/examples/editable-data
+* https://react-table.tanstack.com/docs/examples/material-ui-kitchen-sink
 
 ### react material-ui
 * Custom page navigation: https://codesandbox.io/s/hier2?file=/demo.js:3830-3951
@@ -72,6 +74,31 @@ https://rms-tracker.herokuapp.com/
 ### Form dialogs
 * https://material-ui.com/components/dialogs/#form-dialogs
 * https://blog.bitsrc.io/build-a-full-featured-modal-dialog-form-with-react-651dcef6c571
+
+### Nutrition labels
+* https://www.onlinelabels.com/tools/nutrition-label-generator
+
+### Database design
+* https://dev.to/amckean12/designing-a-relational-database-for-a-cookbook-4nj6
+* https://www.reddit.com/r/compsci/comments/9kmren/has_anyone_tried_to_create_a_recipe_database_im/
+
+### Food facts label 
+* https://getinkahoots.com/nutrition-facts-label/
+
+### Convert units
+* https://www.npmjs.com/package/convert-units
+* https://github.com/justinmklam/recipe-converter
+* https://github.com/hhursev/recipe-scrapers
+* https://github.com/gentooboontoo/js-quantities
+* https://github.com/ben-ng/convert-units
+* https://github.com/infusion/Fraction.js
+
+### Alternatives to Redux
+* https://www.educba.com/redux-alternatives/
+
+
+
+
 
 
 

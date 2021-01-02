@@ -27,6 +27,7 @@ import FoodDelete from "./FoodDelete";
 import FoodEdit from "./FoodEdit";
 
 import FoodService from "../services/food.service";
+import MeasurementService from "../services/measurement-unit";
 
 const Foods = (props) => {
 
@@ -41,6 +42,8 @@ const Foods = (props) => {
   
   const [foodEditOpen, setFoodEditOpen] = useState(false);
   const [foodToEdit, setFoodToEdit] = useState(null);
+
+  const [measurements, setMeasurements] = useState([]);
   
   /**** Row data section ***/
   useEffect(() => {
@@ -49,6 +52,17 @@ const Foods = (props) => {
       (response) => {
         console.log("Got foods");
         setFoods(response.data);
+      },
+      (error) => {
+        console.log("******ERROR: " + JSON.stringify(error.response));
+        alert(JSON.stringify(error.response));
+      });
+
+    MeasurementService.getAllMeasurements().then(
+      (response) => {
+        console.log("Got measurements");
+        setMeasurements(response.data);
+       // resetMeasurementOptions(response.data);
       },
       (error) => {
         console.log("******ERROR: " + JSON.stringify(error.response));
@@ -71,6 +85,7 @@ const Foods = (props) => {
         description: dataItem.description,
         servingSize: dataItem.servingSize,
         calories: dataItem.calories,
+        grams: dataItem.grams,
         id: dataItem.id
       });
     }
@@ -119,7 +134,17 @@ const Foods = (props) => {
     setFoodEditOpen(false);
     setBackdropOpen(true);
     setBackdropMessage("Wait, updating food");
-    FoodService.updateFood(editedFood).then(
+    console.log(JSON.stringify(editedFood, null, 2));
+    let food = {
+      id: editedFood.id,
+      description: editedFood.description,
+      numMeasurementUnits: editedFood.numMeasurementUnits,
+      grams: editedFood.grams,
+      calories: editedFood.calories,
+      measurementUnitId: editedFood.measurementUnit.value,
+      servingSize: editedFood.servingSize
+    };
+    FoodService.updateFood(food).then(
       (response) => {
         console.log(JSON.stringify(response.data));
         triggerFetchFoods();
@@ -128,7 +153,7 @@ const Foods = (props) => {
       (error) => {
         console.log(JSON.stringify(error.response));
         setBackdropOpen(false);
-        alert(`Error updating food ${foodToDelete.description}.\n` + error.response.data.message);
+        alert(`Error updating food ${editedFood.description}.\n` + error.response.data.message);
       }
     );
   };
@@ -369,6 +394,7 @@ const Foods = (props) => {
         handleCloseOk = {handleCloseFoodEditOk}
         handleCloseCancel = {handleCloseFoodEditCancel}
         food = {foodToEdit}
+        measurements={measurements}
       />
     </div>
   )
