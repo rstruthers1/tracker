@@ -93,7 +93,7 @@ const AddRecipe = (props) => {
 
   //const [foodItems, setFoodItems] = useState([]);
   const [shouldShowPrompt, setShouldShowPrompt] = useState(false);
-  //const [totalCalories, setTotalCalories] = useState("");
+  const [totalCalories, setTotalCalories] = useState(0);
   const [instructionsText, setInstructionsText] = useState({ text: '' } );
   const [foodItemSections, setFoodItemSections] = useState([
     {
@@ -281,9 +281,6 @@ const AddRecipe = (props) => {
     foodSection.foodItems = newFoodItems;
     foodSection.totalCalories = newTotalCalories;
     return foodSection;
-    
-    // setFoodItems(newFoodItems);
-    // setTotalCalories(newTotalCalories);
   };
   
   const findFoodItemSection = (sectionId) => {
@@ -296,15 +293,19 @@ const AddRecipe = (props) => {
     let newFoodItemSections = [];
     // try shallow copy 
 
+    let newTotalCalories = 0;
     for (let i = 0; i < foodItemSections.length; i++) {
       let foodItemSection = foodItemSections[i];
       if (foodItemSection.id === updatedFoodItemSection.sectionId) {
         newFoodItemSections.push(updatedFoodItemSection);
+        newTotalCalories += updatedFoodItemSection.totalCalories;
       } else {
-        newFoodItemSections.push(foodItemSection)
+        newFoodItemSections.push(foodItemSection);
+        newTotalCalories += foodItemSection.totalCalories;
       }
     }
     setFoodItemSections(newFoodItemSections);
+    setTotalCalories(newTotalCalories);
   };
   
   const updateFoodItemInSection = (accessor, value, foodItemId, sectionId, payload) => {
@@ -383,7 +384,7 @@ const AddRecipe = (props) => {
       <input value={value}
              onChange={event => handleInputChanged(event)}
              onBlur={event => handleOnBlur(event)}
-             style={{padding: "5px", border: "1px", borderColor: "#ced4da", borderStyle: "solid", borderRadius: ".25rem"}}
+             className="recipeSectionNameInput"
              placeholder="Optional: Ingredient Section Name"
       />
       
@@ -438,11 +439,7 @@ const AddRecipe = (props) => {
       }
     )
   };
-
-  let unitWidth = "150px";
-  let commentWidth = "200px";
-  let foodWidth = "500px";
-
+  
   const modules = {
     toolbar: [
       [{ 'header': [1, 2, false] }],
@@ -532,7 +529,7 @@ const AddRecipe = (props) => {
         <div className="form-group" >
           <div className="col-sm-10" >
             {foods ? (
-            <div style={{padding: "5px", border: "1px", borderColor: "#ced4da", borderStyle: "solid", borderRadius: ".25rem"}}>
+            <div className={"recipeSectionOutline"}>
              
               <h3>
               <SectionNameInput  
@@ -548,14 +545,16 @@ const AddRecipe = (props) => {
                 </Button>
               </div>
 
-              <table style={{maxWidth: "900px"}}>
+              <table className={"recipeSectionTable"}>
                 <thead>
-                <tr><th style={{width: "100px"}}>Amount</th>
-                  <th style={{width: unitWidth}}>Unit</th>
-                  <th style={{width: foodWidth }}>Food</th>
-                  <th style={{width: commentWidth}}>Comment</th>
-                  <th style={{width: "100px"}}>Calories</th>
-                  <th>Delete</th></tr>
+                  <tr>
+                    <th className={"recipeSectionTableCellAmount"}>Amount</th>
+                    <th className={"recipeSectionTableCellUnit"}>Unit</th>
+                    <th className={"recipeSectionTableCellFood"}>Food</th>
+                    <th className={"recipeSectionTableCellComment"}>Comment</th>
+                    <th className={"recipeSectionTableCellCaloriesTh"}>Calories</th>
+                    <th className={"recipeSectionTableCellDeleteTh"}>Delete</th>
+                  </tr>
                 </thead>
 
                 <tbody>
@@ -563,7 +562,7 @@ const AddRecipe = (props) => {
                   foodItemSection.foodItems && foodItemSection.foodItems.map(row => {
                     return (
                       <tr key={row.foodItemId}>
-                        <td style={{verticalAlign: "top", width: "100px"}}>
+                        <td className={"recipeSectionTableCellAmount"}>
                           <CellInput
                             value = {row.amount}
                             onBlur = {handleUpdateFoodItem}
@@ -575,7 +574,7 @@ const AddRecipe = (props) => {
                             row.error && row.error.amount && <p style={{fontSize: "12px", fontWeight: "bold", color: "red"}}>{row.error.amount}</p>
                           }
                         </td>
-                        <td style={{verticalAlign: "top", width: unitWidth}}>
+                        <td className={"recipeSectionTableCellUnit"}>
 
                           <Select
                             options = {row.food.allowedUnits}
@@ -585,19 +584,17 @@ const AddRecipe = (props) => {
 
                           />
                         </td>
-                        <td style={{verticalAlign: "top", width: foodWidth }} >
+                        <td className={"recipeSectionTableCellFood"}>
 
                           <Select
                             options = {populateFoodOptions(foods)}
                             onChange = {(value, actionMetadata) => handleUpdateFoodItem("food", value, row.foodItemId, foodItemSection.id)}
                             value={row.food}
                             styles={editableFoodGroupingSelectStyles}
-
-
                           />
 
                         </td>
-                        <td style={{verticalAlign: "top", width: commentWidth}}>
+                        <td className={"recipeSectionTableCellComment"}>
                           <CellInput
                             value = {row.comment ? row.comment : ""}
                             onBlur = {handleUpdateFoodItem}
@@ -610,9 +607,9 @@ const AddRecipe = (props) => {
                           }
                         </td>
                         <td>
-                          <div style={{ textAlign: "right", width: "100px", fontSize: "12px", paddingRight: "30px"}}>{row.calories}</div>
+                          <div className={"recipeSectionTableCellCaloriesTd"}>{row.calories}</div>
                         </td>
-                        <td style={{ width: "100px" }}>
+                        <td className={"recipeSectionTableCellDeleteTd"}>
                           <IconButton onClick={event=> {handleDeleteFoodItem(row.foodItemId, foodItemSection.id)}} style = {{padding: "0px"}}>
                             <DeleteForeverIcon/>
                           </IconButton>
@@ -620,27 +617,45 @@ const AddRecipe = (props) => {
                       </tr>
                     )
                   })}
-                <tr><td style={{width: "100px"}}></td>
-                  <td style={{width: unitWidth}}></td>
-                  <td style={{width: foodWidth }}></td>
-                  <td style={{width: commentWidth, fontWeight: "bold", textAlign: "right", fontSize: "12px", height: "32px", paddingTop: "10px"}}>Total Calories</td>
-                  <td style={{width: "100px", textAlign: "right", fontSize: "12px", paddingRight: "30px", height: "32px", paddingTop: "10px"}}>{foodItemSection.totalCalories}</td>
-                  <td></td></tr>
+                <tr><td className={"recipeSectionTableCellAmount"}></td>
+                  <td className={"recipeSectionTableCellUnit"}></td>
+                  <td className={"recipeSectionTableCellFood"}></td>
+                  <td className={"recipeSectionTableCellCommentFooter"}>Section Calories</td>
+                  <td className={"recipeSectionTableCellCaloriesFooterTd"}>{foodItemSection.totalCalories}</td>
+                  <td className={"recipeSectionTableCellDeleteTd"}></td></tr>
                 </tbody>
               </table>
-
-              <Prompt when={shouldShowPrompt} message="You have unsaved changes, are you sure you want to leave?"/>
+              
 
             </div>
 
             ) : <div>Loading</div>}
+           
            
           </div>
           
          
         </div>
         )}
+        <div className="form-group">
+          <div className="col-sm-10">
+            <div className={"recipeSectionOutline"}>
+              <table className={"recipeSectionTable"}>
+                <tbody>
+                <tr>
+                  <td className={"recipeSectionTableCellAmount"}></td>
+                  <td className={"recipeSectionTableCellUnit"}></td>
+                  <td className={"recipeSectionTableCellFood"}></td>
+                  <td className={"recipeSectionTableCellCommentFooter"}>Recipe Calories</td>
+                  <td className={"recipeSectionTableCellCaloriesFooterTd"}>{totalCalories}</td>
+                  <td className={"recipeCell"} style={{width: "84px"}}></td>
+                </tr>
 
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
         <div className="form-group">
           <div className="col-sm-10">
             <h2>Instructions</h2>
