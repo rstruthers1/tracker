@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from "react";
-import { Prompt } from 'react-router';
 
 import {useForm} from "react-hook-form";
 
@@ -349,9 +348,7 @@ const AddRecipe = (props) => {
       <input value={value}
              onChange={event => handleInputChanged(event)}
              onBlur={event => handleOnBlur(event)}
-             className="form-control"
-             style={{fontSize: "12px"}}
-             
+             className="form-control recipe-cell-input"
       />
     )
   };
@@ -384,7 +381,7 @@ const AddRecipe = (props) => {
       <input value={value}
              onChange={event => handleInputChanged(event)}
              onBlur={event => handleOnBlur(event)}
-             className="recipeSectionNameInput"
+             className="recipe-section-name-input"
              placeholder="Optional: Ingredient Section Name"
       />
       
@@ -529,7 +526,7 @@ const AddRecipe = (props) => {
         <div className="form-group" >
           <div className="col-sm-10" >
             {foods ? (
-            <div className={"recipeSectionOutline"}>
+            <div className="recipe-section-outline">
              
               <h3>
               <SectionNameInput  
@@ -539,21 +536,21 @@ const AddRecipe = (props) => {
               />
               </h3>
             
-              <div style={{marginBottom: "10px"}}>
-                <Button onClick = {event => handleAddFoodItem(foodItemSection.id)} style={{backgroundColor: '#00548F'}}>
+              <div className="recipe-add-ingredient-container">
+                <Button onClick = {event => handleAddFoodItem(foodItemSection.id)} className="tracker-button">
                   Add Ingredient
                 </Button>
               </div>
 
-              <table className={"recipeSectionTable"}>
+              <table className="recipe-section-table">
                 <thead>
                   <tr>
-                    <th className={"recipeSectionTableCellAmount"}>Amount</th>
-                    <th className={"recipeSectionTableCellUnit"}>Unit</th>
-                    <th className={"recipeSectionTableCellFood"}>Food</th>
-                    <th className={"recipeSectionTableCellComment"}>Comment</th>
-                    <th className={"recipeSectionTableCellCaloriesTh"}>Calories</th>
-                    <th className={"recipeSectionTableCellDeleteTh"}>Delete</th>
+                    <th className="recipe-section-table-cell-amount">Amount</th>
+                    <th className="recipe-section-table-cell-unit">Unit</th>
+                    <th className="recipe-section-table-cell-food">Food</th>
+                    <th className="recipe-section-table-cell-comment">Comment</th>
+                    <th className="recipe-section-table-cell-calories-th">Calories</th>
+                    <th className="recipe-section-table-cell-delete-th">Delete</th>
                   </tr>
                 </thead>
 
@@ -562,7 +559,7 @@ const AddRecipe = (props) => {
                   foodItemSection.foodItems && foodItemSection.foodItems.map(row => {
                     return (
                       <tr key={row.foodItemId}>
-                        <td className={"recipeSectionTableCellAmount"}>
+                        <td className="recipe-section-table-cell-amount">
                           <CellInput
                             value = {row.amount}
                             onBlur = {handleUpdateFoodItem}
@@ -571,20 +568,18 @@ const AddRecipe = (props) => {
                             sectionId = {foodItemSection.id}
                           />
                           {
-                            row.error && row.error.amount && <p style={{fontSize: "12px", fontWeight: "bold", color: "red"}}>{row.error.amount}</p>
+                            row.error && row.error.amount && <p className="input-error">{row.error.amount}</p>
                           }
                         </td>
-                        <td className={"recipeSectionTableCellUnit"}>
-
+                        <td className="recipe-section-table-cell-unit">
                           <Select
                             options = {row.food.allowedUnits}
                             onChange = {(value, actionMetadata) => handleUpdateFoodItem("unit", value, row.foodItemId, foodItemSection.id)}
                             value={row.unit}
                             styles={editableFoodGroupingSelectStyles}
-
                           />
                         </td>
-                        <td className={"recipeSectionTableCellFood"}>
+                        <td className="recipe-section-table-cell-food">
 
                           <Select
                             options = {populateFoodOptions(foods)}
@@ -594,7 +589,7 @@ const AddRecipe = (props) => {
                           />
 
                         </td>
-                        <td className={"recipeSectionTableCellComment"}>
+                        <td className="recipe-section-table-cell-comment">
                           <CellInput
                             value = {row.comment ? row.comment : ""}
                             onBlur = {handleUpdateFoodItem}
@@ -603,26 +598,27 @@ const AddRecipe = (props) => {
                             sectionId = {foodItemSection.id}
                           />
                           {
-                            row.error && row.error.amount && <p style={{fontSize: "12px", fontWeight: "bold", color: "red"}}>{row.error.comment}</p>
+                            row.error && row.error.amount && <p className="input-error">{row.error.comment}</p>
                           }
                         </td>
                         <td>
-                          <div className={"recipeSectionTableCellCaloriesTd"}>{row.calories}</div>
+                          <div className="recipe-section-table-cell-calories-td">{row.calories}</div>
                         </td>
-                        <td className={"recipeSectionTableCellDeleteTd"}>
-                          <IconButton onClick={event=> {handleDeleteFoodItem(row.foodItemId, foodItemSection.id)}} style = {{padding: "0px"}}>
+                        <td className="recipe-section-table-cell-delete-td">
+                          <IconButton onClick={event=> {handleDeleteFoodItem(row.foodItemId, foodItemSection.id)}} 
+                                      className="icon-button">
                             <DeleteForeverIcon/>
                           </IconButton>
                         </td>
                       </tr>
                     )
                   })}
-                <tr><td className={"recipeSectionTableCellAmount"}></td>
-                  <td className={"recipeSectionTableCellUnit"}></td>
-                  <td className={"recipeSectionTableCellFood"}></td>
-                  <td className={"recipeSectionTableCellCommentFooter"}>Section Calories</td>
-                  <td className={"recipeSectionTableCellCaloriesFooterTd"}>{foodItemSection.totalCalories}</td>
-                  <td className={"recipeSectionTableCellDeleteTd"}></td></tr>
+                <tr><td className="recipe-section-table-cell-amount"></td>
+                  <td className="recipe-section-table-cell-unit"></td>
+                  <td className="recipe-section-table-cell-food"></td>
+                  <td className="recipe-section-table-cell-comment-footer">Section Calories</td>
+                  <td className="recipe-section-table-cell-calories-footer-fd">{foodItemSection.totalCalories}</td>
+                  <td className="recipe-section-table-cell-delete-td"></td></tr>
                 </tbody>
               </table>
               
@@ -639,16 +635,16 @@ const AddRecipe = (props) => {
         )}
         <div className="form-group">
           <div className="col-sm-10">
-            <div className={"recipeSectionOutline"}>
-              <table className={"recipeSectionTable"}>
+            <div className="recipe-section-outline">
+              <table className="recipe-section-table">
                 <tbody>
                 <tr>
-                  <td className={"recipeSectionTableCellAmount"}></td>
-                  <td className={"recipeSectionTableCellUnit"}></td>
-                  <td className={"recipeSectionTableCellFood"}></td>
-                  <td className={"recipeSectionTableCellCommentFooter"}>Recipe Calories</td>
-                  <td className={"recipeSectionTableCellCaloriesFooterTd"}>{totalCalories}</td>
-                  <td className={"recipeCell"} style={{width: "84px"}}></td>
+                  <td className="recipe-section-table-cell-amount"></td>
+                  <td className="recipe-section-table-cell-unit"></td>
+                  <td className="recipe-section-table-cell-food"></td>
+                  <td className="recipe-section-table-cell-comment-footer">Recipe Calories</td>
+                  <td className="recipe-section-table-cell-calories-footer-fd">{totalCalories}</td>
+                  <td className="recipe-section-table-cell-delete-td"></td>
                 </tr>
 
                 </tbody>
@@ -668,7 +664,7 @@ const AddRecipe = (props) => {
         
         <div className="form-group">
           <div className="col-sm-2">
-            <button type="submit" style={{backgroundColor: '#00548F'}} className="btn btn-primary btn-block">Submit</button>
+            <button type="submit" className="btn btn-primary btn-block tracker-button">Submit</button>
           </div>
         </div>
        

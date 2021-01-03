@@ -174,38 +174,38 @@ input {display: block; padding: 0; margin: 0; border: 0; width: 100%;}
 td {margin: 0; padding: 0;}
 
 
-.recipeSectionOutline {
+.recipe-section-outline {
   padding: 5px;
   border-radius: .25rem;
   border: 1px solid #ced4da;
 }
 
-.recipeSectionTable {
+.recipe-section-table {
   maxWidth: 900px;
   /*border: 1px dashed #ced4da;*/
 }
 
-.recipeSectionTableCellAmount {
+.recipe-section-table-cell-amount {
   width: 86px;
   /*border: 1px dashed #ced4da;*/
 }
 
-.recipeSectionTableCellUnit {
+.recipe-section-table-cell-unit {
   width: 109px;
   /*border: 1px dashed #ced4da;*/
 }
 
-.recipeSectionTableCellFood {
+.recipe-section-table-cell-food {
   width: 335px;
   /*border: 1px dashed #ced4da;*/
 }
 
-.recipeSectionTableCellComment {
+.recipe-section-table-cell-comment {
   width: 156px;
   /*border: 1px dashed #ced4da;*/
 }
 
-.recipeSectionTableCellCommentFooter {
+.recipe-section-table-cell-comment-footer {
   width: 156px;
   font-weight: bold;
   text-align: right;
@@ -215,13 +215,13 @@ td {margin: 0; padding: 0;}
   /*border: 1px dashed #ced4da;*/
 }
 
-.recipeSectionTableCellCaloriesTh {
+.recipe-section-table-cell-calories-th {
   width: 88px;
   /*border: 1px dashed #ced4da;*/
 }
 
 
-.recipeSectionTableCellCaloriesTd {
+.recipe-section-table-cell-calories-td {
   width: 88px;
   text-align: right;
   font-size: 12px;
@@ -231,7 +231,7 @@ td {margin: 0; padding: 0;}
   /*border: 1px dashed #ced4da;*/
 }
 
-.recipeSectionTableCellCaloriesFooterTd {
+.recipe-section-table-cell-calories-footer-fd {
   width: 88px;
   text-align: right;
   font-weight: bold;
@@ -242,23 +242,44 @@ td {margin: 0; padding: 0;}
   /*border: 1px dashed #ced4da;*/
 }
 
-.recipeSectionTableCellDeleteTh {
+.recipe-section-table-cell-delete-th {
   width: 84px;
   /*border: 1px dashed #ced4da;*/
 }
 
-.recipeSectionTableCellDeleteTd {
+.recipe-section-table-cell-delete-td {
   width: 84px;
   text-align: center;
   /*border: 1px dashed #ced4da;*/
 }
 
-.recipeSectionNameInput {
+.recipe-section-name-input {
   padding: 5px;
   border-radius: .25rem;
   /*border: 1px dashed #ced4da;*/
 }
 
+.recipe-cell-input {
+  font-size: 12px;
+}
+
+.recipe-add-ingredient-container {
+  margin-bottom: 10px;
+}
+
+.tracker-button {
+  background-color: #00548F;
+}
+
+.input-error {
+  font-size: 12px;
+  font-weight: bold;
+  color: red;
+}
+
+.icon-button {
+  padding: 0px;
+}
 
 
 
